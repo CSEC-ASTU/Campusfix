@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages | CampusFix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root {
+            --primary: #ff6b4a;
+            --primary-soft: #fff1ed;
+            --dark: #2d3436;
+            --gray: #8d99ae;
+            --bg: #f4f6f9;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            background: var(--bg);
+            color: var(--dark);
+            overflow: hidden;
+        }
+
+        /* SIDEBAR STYLES */
+        .sidebar {
+            width: 300px;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            height: 100vh;
+        }
+
+        .sidebar-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+
+        .logo-dot {
+            width: 14px;
+            height: 14px;
+            background: var(--primary);
+            border-radius: 4px;
+            transform: rotate(45deg);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: all 0.25s ease;
+            margin-bottom: 8px;
+            width: 100%;
+            border: none;
+            background: none;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* MAIN MESSAGING AREA */
+        .main {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .chat-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            flex: 1;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .conv-list {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .chat-window {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            background: #fafbfc;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            outline: none;
+        }
+
+        .send-btn {
+            background: var(--dark);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-sm {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-card">
+            <div class="logo"><div class="logo-dot"></div> CAMPUSFix</div>
+            <a href="/admin-dashboard" class="nav-item">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </a>
+            <a href="/admin-dashboard" class="nav-item">
+                <i class="fa-solid fa-clipboard-list"></i> Issues
+            </a>
+            <a href="/message" class="nav-item active">
+                <i class="fa-solid fa-message"></i> Messages
+            </a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="card">
+            <div style="display:flex; align-items:center; gap:15px">
+                <a href="/admin-dashboard" style="color:var(--gray); font-size:1.2rem;"><i class="fa-solid fa-arrow-left"></i></a>
+                <h1 style="margin:0; font-size:1.6rem;">Messages</h1>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="card conv-list">
+                <h3 style="margin-top:0; font-size:1rem;">Conversations</h3>
+                <div style="text-align: center; margin-top: 50px; color: var(--gray);">
+                    <i class="fa-solid fa-inbox" style="font-size: 2.5rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
+                    <p style="font-size: 0.9rem;">No conversations yet</p>
+                </div>
+            </div>
+
+            <div class="card chat-window">
+                <div class="chat-header">
+                    <div class="avatar-sm"><i class="fa-solid fa-user"></i></div>
+                    <div>
+                        <strong style="display:block; font-size:0.95rem;">Select a contact</strong>
+                        <small style="color:var(--gray)">Offline</small>
+                    </div>
+                </div>
+
+                <div class="chat-messages">
+                    <p>Choose a conversation to start messaging.</p>
+                </div>
+
+                <div class="chat-input-area">
+                    <input type="text" placeholder="Type a message...">
+                    <button class="send-btn">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
