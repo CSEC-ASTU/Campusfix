@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Portal | Campus Fix</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=Playfair+Display:ital,wght@1,700&display=swap');
+
+:root { --bg: #F9F7F2; --brand: #C84C2C; --tech: #2C6AC8; --accent: #1A1A1A; }
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg);
+    color: var(--accent);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color 0.5s ease;
+}
+
+.serif { font-family: 'Playfair Display', serif; }
+
+.role-switcher {
+    display: flex;
+    background: rgba(0,0,0,0.05);
+    padding: 4px;
+    border-radius: 16px;
+    margin-bottom: 2.5rem;
+}
+
+.role-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+.role-btn.active {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.admin-active .role-btn.active { color: var(--brand); }
+.tech-active .role-btn.active { color: var(--tech); }
+
+.login-card {
+    background: #F9F7F2;
+    border-radius: 40px;
+    box-shadow: 20px 20px 60px #d4d2ce, -20px -20px 60px #ffffff;
+    border: 1px solid rgba(255,255,255,0.6);
+    width: 100%;
+    max-width: 480px;
+    padding: 3rem;
+    transition: transform 0.4s ease;
+}
+
+.input-group { position: relative; margin-bottom: 1.5rem; }
+
+.input-field {
+    width: 100%;
+    background: transparent;
+    border-bottom: 2px solid rgba(0,0,0,0.05);
+    padding: 1rem 0.5rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.admin-active .input-field:focus { border-color: var(--brand); }
+.tech-active .input-field:focus { border-color: var(--tech); }
+
+.input-label {
+    position: absolute;
+    left: 0.5rem; top: 1rem;
+    font-size: 0.75rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    opacity: 0.3; pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.input-field:focus + .input-label,
+.input-field:not(:placeholder-shown) + .input-label {
+    top: -0.5rem; opacity: 1; font-size: 0.65rem;
+}
+
+.admin-active .input-field:focus + .input-label { color: var(--brand); }
+.tech-active .input-field:focus + .input-label { color: var(--tech); }
+
+.btn-submit {
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: 20px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: white;
+    transition: all 0.4s ease;
+}
+
+.admin-active .btn-submit { background: var(--brand); box-shadow: 0 10px 20px rgba(200,76,44,0.2); }
+.tech-active .btn-submit { background: var(--tech); box-shadow: 0 10px 20px rgba(44,106,200,0.2); }
+
+.btn-submit:hover { transform: translateY(-3px); opacity: 0.9; }
+
+.animate-in { animation: slideUp 1.2s cubic-bezier(0.2,0.8,0.2,1) forwards; }
+@keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+.hidden { display: none; }
+.text-link { color: var(--brand); cursor: pointer; text-decoration: underline; font-size: 10px; }
+</style>
+</head>
+<body class="admin-active">
+
+<main class="login-card animate-in">
+
+    <header class="text-center mb-10">
+        <div class="inline-flex items-center gap-2 mb-6">
+            <div id="status-dot" class="w-2.5 h-2.5 rounded-full bg-[#C84C2C] transition-colors duration-500"></div>
+            <span id="portal-tag" class="text-xs font-extrabold tracking-[0.4em] uppercase opacity-30">Admin Command</span>
+        </div>
+        <h1 class="text-4xl font-extrabold tracking-tighter mb-2">
+            Master <span id="title-italic" class="serif font-light italic text-[#C84C2C] transition-colors duration-500">Access.</span>
+        </h1>
+    </header>
+
+    <div class="role-switcher">
+        <button onclick="switchRole('admin')" id="adminBtn" class="role-btn active">Administrator</button>
+        <button onclick="switchRole('tech')" id="techBtn" class="role-btn">Technical Staff</button>
+    </div>
+
+    <!-- ===== LOGIN FORM ===== -->
+    <form id="adminLoginForm" onsubmit="handleMasterLogin(event)">
+        <div class="input-group">
+            <input type="text" id="masterId" class="input-field" placeholder=" " required>
+            <label id="idLabel" class="input-label">Admin Credentials</label>
+        </div>
+
+        <div class="input-group">
+            <input type="password" id="masterPass" class="input-field" placeholder=" " required>
+            <label class="input-label">Access Key</label>
+        </div>
+
+        <button type="submit" class="btn-submit mt-4">Verify Identity</button>
+
+        <p class="mt-4 text-center">
+            First time admin? <span class="text-link" onclick="showRegister()">Register here</span>
+        </p>
+    </form>
+
+    <!-- ===== ADMIN REGISTRATION FORM ===== -->
+    <form id="adminRegisterForm" class="hidden" onsubmit="handleAdminRegister(event)">
+        <div class="input-group">
+            <input type="text" id="adminFirstName" class="input-field" placeholder=" " required>
+            <label class="input-label">First Name</label>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="adminLastName" class="input-field" placeholder=" " required>
+            <label class="input-label">Last Name</label>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="adminUsername" class="input-field" placeholder=" " required>
+            <label class="input-label">Username</label>
+        </div>
+
+        <div class="input-group">
+            <input type="password" id="adminPassword" class="input-field" placeholder=" " required>
+            <label class="input-label">Password</label>
+        </div>
+
+       <div class="input-group hidden">
+    <input type="hidden" id="adminToken" value="1234">
+    <label class="input-label">Security Token</label>
+</div>
+
+
+        <button type="submit" class="btn-submit mt-4">Register Admin</button>
+
+        <p class="mt-4 text-center">
+            Already have account? <span class="text-link" onclick="showLogin()">Login here</span>
+        </p>
+    </form>
+
+</main>
+
+<script>
+function switchRole(role) {
+    const body = document.body;
+    const adminBtn = document.getElementById('adminBtn');
+    const techBtn = document.getElementById('techBtn');
+    const statusDot = document.getElementById('status-dot');
+    const portalTag = document.getElementById('portal-tag');
+    const titleItalic = document.getElementById('title-italic');
+    const idLabel = document.getElementById('idLabel');
+
+    if (role === 'admin') {
+        body.className = 'admin-active';
+        adminBtn.classList.add('active');
+        techBtn.classList.remove('active');
+        statusDot.style.backgroundColor = '#C84C2C';
+        portalTag.innerText = 'Admin Command';
+        titleItalic.style.color = '#C84C2C';
+        idLabel.innerText = 'Admin Credentials';
+    } else {
+        body.className = 'tech-active';
+        techBtn.classList.add('active');
+        adminBtn.classList.remove('active');
+        statusDot.style.backgroundColor = '#2C6AC8';
+        portalTag.innerText = 'Technical Fleet';
+        titleItalic.style.color = '#2C6AC8';
+        idLabel.innerText = 'Engineer Token';
+    }
+}
+
+function showRegister() {
+    document.getElementById('adminLoginForm').classList.add('hidden');
+    document.getElementById('adminRegisterForm').classList.remove('hidden');
+}
+function showLogin() {
+    document.getElementById('adminRegisterForm').classList.add('hidden');
+    document.getElementById('adminLoginForm').classList.remove('hidden');
+}
+
+// LOGIN HANDLER
+function handleMasterLogin(e){
+    e.preventDefault();
+    alert('Implement backend login here');
+}
+
+// REGISTRATION HANDLER
+function handleAdminRegister(e){
+    e.preventDefault();
+    alert('Implement backend registration here');
+}
+
+
+
+
+
+
+
+
+
+
+
+// REGISTRATION
+function handleAdminRegister(e){
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+
+    const first_name = document.getElementById('adminFirstName').value.trim();
+    const last_name = document.getElementById('adminLastName').value.trim();
+    const username = document.getElementById('adminUsername').value.trim();
+    const password = document.getElementById('adminPassword').value.trim();
+    const token = document.getElementById('adminToken').value;
+
+    btn.innerHTML = '<i class="fas fa-circle-notch animate-spin mr-2"></i> Registering...';
+    btn.disabled = true;
+
+    fetch('/adminRegister', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ first_name, last_name, username, password, token })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        if(data.success) showLogin();
+        btn.innerHTML = 'Register Admin';
+        btn.disabled = false;
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Server error');
+        btn.innerHTML = 'Register Admin';
+        btn.disabled = false;
+    });
+}
+
+// LOGIN
+function handleMasterLogin(e){
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+
+    const username = document.getElementById('masterId').value.trim();
+    const password = document.getElementById('masterPass').value.trim();
+
+    btn.innerHTML = '<i class="fas fa-circle-notch animate-spin mr-2"></i> Logging in...';
+    btn.disabled = true;
+
+    fetch('/adminLogin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        btn.innerHTML = 'Verify Identity';
+        btn.disabled = false;
+
+        if(data.success){
+            window.location.href = '/admin-dashboard';
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Server error');
+        btn.innerHTML = 'Verify Identity';
+        btn.disabled = false;
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
