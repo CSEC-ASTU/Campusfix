@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login/Register | Campus Fix ASTU</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=Playfair+Display:ital,wght@1,700&display=swap');
+
+:root {
+    --bg: #F9F7F2;
+    --brand: #C84C2C;
+    --accent: #1A1A1A;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg);
+    color: var(--accent);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.serif { font-family: 'Playfair Display', serif; }
+
+.login-card {
+    background: #F9F7F2;
+    border-radius: 40px;
+    box-shadow: 20px 20px 60px #d4d2ce, -20px -20px 60px #ffffff;
+    border: 1px solid rgba(255,255,255,0.6);
+    width: 100%;
+    max-width: 480px;
+    padding: 3rem;
+    position: relative;
+    z-index: 10;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-field {
+    width: 100%;
+    background: transparent;
+    border-bottom: 2px solid rgba(0,0,0,0.05);
+    padding: 1rem 0.5rem;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-field:focus {
+    border-color: var(--brand);
+}
+
+.input-label {
+    position: absolute;
+    left: 0.5rem;
+    top: 1rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    opacity: 0.3;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.input-field:focus + .input-label,
+.input-field:not(:placeholder-shown) + .input-label {
+    top: -0.5rem;
+    opacity: 1;
+    color: var(--brand);
+    font-size: 0.65rem;
+}
+
+.btn-login, .btn-register {
+    background: var(--accent);
+    color: #F9F7F2;
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: 20px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    margin-top: 1rem;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.btn-login:hover, .btn-register:hover {
+    background: var(--brand);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(200, 76, 44, 0.2);
+}
+
+.blob {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(200,76,44,0.05) 0%, rgba(249,247,242,0) 70%);
+    z-index: 1;
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.animate-in {
+    animation: slideUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.error-msg {
+    font-size: 0.65rem;
+    color: #dc2626;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.toggle-link {
+    font-size: 0.75rem;
+    color: var(--brand);
+    cursor: pointer;
+    text-decoration: underline;
+    margin-top: 0.5rem;
+}
+</style>
+</head>
+<body>
+
+<div class="blob -top-48 -left-48"></div>
+<div class="blob -bottom-48 -right-48"></div>
+
+<main class="login-card animate-in">
+
+    <header class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 mb-6">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#C84C2C]"></div>
+            <span class="text-xs font-extrabold tracking-[0.4em] uppercase opacity-30">ASTU Portal</span>
+        </div>
+        <h1 id="formTitle" class="text-4xl font-extrabold tracking-tighter mb-2">
+            Welcome <span class="serif font-light italic text-[#C84C2C]">Back.</span>
+        </h1>
+        <p id="formSubtitle" class="text-xs font-medium text-slate-400 tracking-wide uppercase">
+            Enter your student credentials to continue
+        </p>
+    </header>
+
+    <!-- LOGIN FORM -->
+    <form id="loginForm">
+        <div class="input-group">
+            <input type="text" id="loginStudentId" class="input-field" placeholder=" " required>
+            <label class="input-label">Student ID</label>
+            <div class="error-msg" id="loginStudentIdError"></div>
+        </div>
+
+        <div class="input-group">
+            <input type="password" id="loginPassword" class="input-field" placeholder=" " required>
+            <label class="input-label">Password</label>
+            <div class="error-msg" id="loginPasswordError"></div>
+        </div>
+
+        <button type="submit" class="btn-login">Secure Access</button>
+        <div class="text-center toggle-link" id="showRegister">Don't have an account? Register</div>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form id="registerForm" class="hidden">
+        <div class="input-group">
+            <input type="text" id="regFirstName" class="input-field" placeholder=" " required>
+            <label class="input-label">First Name</label>
+            <div class="error-msg" id="regFirstNameError"></div>
+        </div>
+        <div class="input-group">
+            <input type="text" id="regLastName" class="input-field" placeholder=" " required>
+            <label class="input-label">Last Name</label>
+            <div class="error-msg" id="regLastNameError"></div>
+        </div>
+        <div class="input-group">
+            <input type="text" id="regStudentId" class="input-field" placeholder=" " required>
+            <label class="input-label">Student ID</label>
+            <div class="error-msg" id="regStudentIdError"></div>
+        </div>
+        
+           <div class="input-group">
+                <input type="email" id="regEmail" class="input-field" placeholder=" " required>
+                <label class="input-label">Email</label>
+                <div class="error-msg" id="regEmailError"></div>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="regPassword" class="input-field" placeholder=" " required>
+                <label class="input-label">Password</label>
+                <div class="error-msg" id="regPasswordError"></div>
+            </div>
+
+        <button type="submit" class="btn-register">Register</button>
+        <div class="text-center toggle-link" id="showLogin">Already have an account? Login</div>
+    </form>
+
+    <footer class="mt-12 text-center">
+        <p class="text-[9px] font-bold uppercase tracking-[0.3em] opacity-30">
+            Authorized Access Only • Adama Science & Tech
+        </p>
+
+        <button onclick="window.location.href='/'">Back to Home</button>
+    </footer>
+</main>
+
+<script>
+// Toggle between login and register
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+const formTitle = document.getElementById('formTitle');
+const formSubtitle = document.getElementById('formSubtitle');
+
+document.getElementById('showRegister').addEventListener('click', () => {
+    loginForm.classList.add('hidden');
+    registerForm.classList.remove('hidden');
+    formTitle.innerHTML = 'Register <span class="serif font-light italic text-[#C84C2C]">Now.</span>';
+    formSubtitle.textContent = 'Create your student account';
+});
+
+document.getElementById('showLogin').addEventListener('click', () => {
+    registerForm.classList.add('hidden');
+    loginForm.classList.remove('hidden');
+    formTitle.innerHTML = 'Welcome <span class="serif font-light italic text-[#C84C2C]">Back.</span>';
+    formSubtitle.textContent = 'Enter your student credentials to continue';
+});
+
+// LOGIN
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = loginForm.querySelector('button');
+    btn.innerHTML = '<i class="fas fa-circle-notch animate-spin mr-2"></i> Verifying';
+    btn.disabled = true;
+
+    const Stud_Id = document.getElementById('loginStudentId').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    try {
+        const res = await fetch('/Studlogin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ Stud_Id, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            btn.innerHTML = '<i class="fas fa-check mr-2"></i> Access Granted';
+            btn.style.backgroundColor = '#10B981';
+            setTimeout(() => window.location.href = '/studentdashboard', 800);
+        } else {
+            alert(data.message);
+            btn.innerHTML = 'Secure Access';
+            btn.disabled = false;
+        }
+    } catch(err) {
+        console.error(err);
+        btn.innerHTML = 'Secure Access';
+        btn.disabled = false;
+        alert('Server error');
+    }
+});
+
+// REGISTER
+registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = registerForm.querySelector('button');
+    btn.innerHTML = '<i class="fas fa-circle-notch animate-spin mr-2"></i> Creating...';
+    btn.disabled = true;
+
+    const first_name = document.getElementById('regFirstName').value.trim();
+    const last_name = document.getElementById('regLastName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const Stud_Id = document.getElementById('regStudentId').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+
+    try {
+        const res = await fetch('/Studregister', { // backend registration endpoint
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ first_name, last_name, email, Stud_Id, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert('Registration successful! Please login.');
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            btn.innerHTML = 'Register';
+            btn.disabled = false;
+        } else {
+            alert(data.message);
+            btn.innerHTML = 'Register';
+            btn.disabled = false;
+        }
+    } catch(err) {
+        console.error(err);
+        alert('Server error');
+        btn.innerHTML = 'Register';
+        btn.disabled = false;
+    }
+});
+</script>
+
+</body>
+</html>
