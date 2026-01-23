@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>CampusFix Dashboard</title>
+</head>
+<body class="bg-[#F8F7F2] min-h-screen font-sans text-slate-800">
+
+    <header class="flex justify-between items-center px-8 py-4 bg-white/50 backdrop-blur-sm">
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 bg-orange-600 rounded-full"></div>
+            <h1 class="font-bold text-xl tracking-tight text-[#1E293B]">CAMPUS<span class="italic text-slate-500">fix</span></h1>
+        </div>
+        <div class="flex gap-6 items-center text-sm font-medium text-slate-600">
+            <button class="flex items-center gap-2 hover:text-slate-900" onclick="window.location.href='/ai-support'">
+                <i class="fa-solid fa-robot"></i> AI Support
+            </button>
+            <button id="logoutBtn" class="flex items-center gap-2 text-red-500 hover:text-red-700">
+    <i class="fa-solid fa-right-from-bracket"></i> Logout
+</button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-8">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-[#1E293B]">Student Dashboard</h2>
+            <p class="text-slate-500">
+    Welcome back, <span id="studentName">Student</span>!
+</p>
+
+<script>
+async function loadStudentName() {
+    const nameSpan = document.getElementById('studentName');
+
+    try {
+        const res = await fetch('/getStudentInfo');
+        const data = await res.json();
+
+        if (data.success) {
+            nameSpan.textContent = data.studentName;
+        } else {
+            nameSpan.textContent = 'Guest';
+        }
+    } catch (err) {
+        console.error('Failed to load student name', err);
+        nameSpan.textContent = 'Guest';
+    }
+}
+
+// Call this on page load
+loadStudentName();
+</script>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div id="openModal" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all">
+                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                </div>
+                <h3 class="font-bold text-lg">Report Issue</h3>
+                <p class="text-slate-500 text-sm">Report a new infrastructure problem</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100" onclick="window.location.href='/ai-support'">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-robot text-xl"></i>
+                </div>
+                <h3 class="font-bold text-lg">AI Support</h3>
+                <p class="text-slate-500 text-sm">Get instant help from AI assistant</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                </div>
+                <h3 class="font-bold text-lg">My Reports</h3>
+                <p class="text-slate-500 text-sm">View your reported issues</p>
+            </div>
+        </div>
+
+
+
+      <div id="recentReports" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 min-h-[300px] flex flex-col">
+    <h3 class="font-bold text-xl mb-4">Recent Reports</h3>
+    <div id="reportsContainer" class="flex-1 flex flex-col gap-4 items-stretch justify-start overflow-y-auto">
+        <p class="text-slate-400">Loading reports...</p>
+    </div>
+</div>
+
+<script>
+async function loadReports() {
+    const container = document.getElementById('reportsContainer');
+    container.innerHTML = '<p class="text-slate-400">Loading reports...</p>';
+
+    try {
+        const res = await fetch('/myReports');
+        const data = await res.json();
+
+        if (!data.success) {
+            container.innerHTML = `<p class="text-red-500">${data.message}</p>`;
+            return;
+        }
+
+        if (data.reports.length === 0) {
+            container.innerHTML = `<p class="text-slate-400">No reports yet. Report your first issue!</p>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        data.reports.forEach(report => {
+            const statusColor = report.status === 'Pending' ? 'bg-yellow-400'
+                              : report.status === 'Completed' ? 'bg-green-500'
+                              : 'bg-red-500';
+
+            const card = document.createElement('div');
+            card.className = 'p-4 border rounded-xl shadow-sm flex flex-col gap-2 relative';
+
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <h4 class="font-semibold">${report.issueType}</h4>
+                    <span class="w-3 h-3 rounded-full ${statusColor}"></span>
+                </div>
+                <p class="text-sm text-slate-600">${report.description}</p>
+                <p class="text-xs text-slate-400">Location: ${report.location}</p>
+                <p class="text-xs text-slate-400">Submitted: ${new Date(report.created_at).toLocaleString()}</p>
+                ${report.status === 'Pending' ? `<button class="confirmBtn mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" data-id="${report.id}">Confirm Completed</button>` : ''}
+            `;
+
+            container.appendChild(card);
+        });
+
+        // Add event listeners for confirm buttons
+        document.querySelectorAll('.confirmBtn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const issueId = btn.getAttribute('data-id');
+                btn.disabled = true;
+                btn.textContent = 'Updating...';
+
+                try {
+                    const res = await fetch('/confirmIssue', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ issueId })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        loadReports(); // reload list
+                    } else {
+                        alert(data.message);
+                        btn.disabled = false;
+                        btn.textContent = 'Confirm Completed';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Server error');
+                    btn.disabled = false;
+                    btn.textContent = 'Confirm Completed';
+                }
+            });
+        });
+
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = `<p class="text-red-500">Failed to load reports</p>`;
+    }
+}
+
+// Call this function when the page loads
+loadReports();
+
+</script>
+
+
+
+    </main>
+
+    <div id="issueModal" class="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-50 px-4 hidden">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative">
+            <button id="closeIcon" class="absolute right-6 top-6 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <h2 class="text-2xl font-bold mb-6 text-[#1E293B]">Report New Issue</h2>
+
+     <form id="issueForm" class="space-y-5" enctype="multipart/form-data">
+    <div>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Issue Type</label>
+        <select id="issueType" class="w-full border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 appearance-none">
+            <option value="">Select issue type</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Furniture">Furniture</option>
+        </select>
+    </div>
+
+    <div>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Location</label>
+        <input type="text" id="issueLocation" placeholder="e.g., Dormitory A, Room 205" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-400">
+    </div>
+
+    <div>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Description</label>
+        <textarea id="issueDescription" rows="4" placeholder="Describe the issue in detail..." class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-400 resize-none"></textarea>
+    </div>
+
+    <div>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Upload Photo (Optional)</label>
+        <div class="border border-slate-200 rounded-xl p-2 bg-white flex items-center">
+            <input type="file" id="issuePhoto" class="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
+        </div>
+    </div>
+
+    <div class="flex gap-4 pt-4">
+        <button type="button" id="closeBtn" class="flex-1 py-3 px-6 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-colors">Cancel</button>
+        <button type="submit" class="flex-1 py-3 px-6 bg-[#1E293B] text-white rounded-xl font-bold hover:bg-slate-800 transition-colors">Submit Report</button>
+    </div>
+</form>
+
+        </div>
+    </div>
+
+    <script>
+        const openModal = document.getElementById('openModal');
+        const closeModalIcon = document.getElementById('closeIcon');
+        const closeModalBtn = document.getElementById('closeBtn');
+        const modal = document.getElementById('issueModal');
+
+        // Function to open modal
+        openModal.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+        });
+
+        // Function to close modal
+        const hideModal = () => {
+            modal.classList.add('hidden');
+        };
+
+        closeModalIcon.addEventListener('click', hideModal);
+        closeModalBtn.addEventListener('click', hideModal);
+
+        // Close modal if user clicks outside the white box
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+    </script>
+
+
+<script>
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    logoutBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/studentlogout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                // Redirect to login page
+                window.location.href = '/Studlogin'; // replace with your login URL
+            } else {
+                alert('Logout failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Something went wrong.');
+        }
+    });
+</script>
+
+
+
+<script>
+const issueForm = document.getElementById('issueForm');
+
+issueForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = issueForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    // Get form data
+    const issueType = document.getElementById('issueType').value;
+    const location = document.getElementById('issueLocation').value;
+    const description = document.getElementById('issueDescription').value;
+    const photoInput = document.getElementById('issuePhoto');
+
+    // Create FormData for optional file upload
+    const formData = new FormData();
+    formData.append('issueType', issueType);
+    formData.append('location', location);
+    formData.append('description', description);
+    if (photoInput.files[0]) {
+        formData.append('photo', photoInput.files[0]);
+    }
+
+    try {
+        const response = await fetch('/submitIssue', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            alert('Issue reported successfully!');
+            issueForm.reset();
+        } else {
+            alert(data.message || 'Failed to submit issue.');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Server error.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Report';
+    }
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
