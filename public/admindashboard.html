@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CampusFix Admin Dashboard</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+:root {
+  --primary: #ff6b4a;
+  --primary-soft: #fff1ed;
+  --dark: #2d3436;
+  --gray: #8d99ae;
+  --bg: #f4f6f9;
+  --white: #ffffff;
+  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  background: var(--bg);
+  color: var(--dark);
+  overflow: hidden; 
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 300px; 
+  padding: 25px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  height: 100vh;
+}
+
+.sidebar-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 24px; 
+  box-shadow: var(--shadow);
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 25px;
+  color: var(--dark);
+  letter-spacing: -0.5px;
+}
+
+.logo-dot {
+  width: 14px;
+  height: 14px;
+  background: var(--primary);
+  border-radius: 4px; 
+  transform: rotate(45deg);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px; 
+  border-radius: 14px;
+  cursor: pointer;
+  color: var(--gray);
+  transition: all 0.25s ease;
+  margin-bottom: 8px;
+  width: 100%;
+  border: none;
+  background: none;
+  font-size: 1rem;
+}
+
+.nav-item i {
+  width: 20px;
+  font-size: 1.1rem;
+}
+
+.nav-item:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.nav-item.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.badge {
+  margin-left: auto;
+  background: var(--primary);
+  color: white;
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Profile Section */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.profile strong {
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.profile small {
+  color: var(--gray);
+  font-size: 0.8rem;
+}
+
+/* ================= MAIN CONTENT ================= */
+.main {
+  flex: 1;
+  padding: 40px; 
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+.card {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 35px; 
+  box-shadow: var(--shadow);
+  margin-bottom: 30px;
+}
+
+.card h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+}
+
+/* ================= STATS GRID ================= */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.stat {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  box-shadow: var(--shadow);
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+
+.blue { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); }
+.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+.yellow { background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%); }
+.purple { background: linear-gradient(135deg, #da22ff 0%, #9733ee 100%); }
+
+.stat-info { text-align: right; }
+.stat-info span { font-size: 0.75rem; color: var(--gray); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 5px; }
+.stat-info h2 { margin: 0; font-size: 1.6rem; }
+
+/* ================= TABLE AREA ================= */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.search {
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1px solid #edf2f7;
+  background: #f8fafc;
+  outline: none;
+  width: 280px;
+}
+
+.btn {
+  background: var(--dark);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 16px;
+  color: var(--gray);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  border-bottom: 2px solid #f8fafc;
+}
+
+td {
+  padding: 20px 16px;
+  border-bottom: 1px solid #f8fafc;
+  font-size: 0.95rem;
+}
+
+.avatar-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.status {
+  background: #def7ec;
+  color: #03543f;
+  font-size: 0.7rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.delete {
+  background: #fff5f5;
+  border: none;
+  color: #e53e3e;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* ================= MODAL ================= */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 52, 70, 0.4);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  width: 450px;
+  padding: 40px;
+  border-radius: 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gray);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.modal input, .modal select {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 1rem;
+  outline: none;
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-card">
+    <div class="logo"><div class="logo-dot"></div> CAMPUSFix</div>
+
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <i class="fa-solid fa-house"></i> Dashboard
+      <span class="badge">Live</span>
+    </button>
+
+    <button class="nav-item" onclick="showPage('issues')">
+      <i class="fa-solid fa-clipboard-list"></i> Issues
+    </button>
+
+    <button class="nav-item" onclick="window.location.href='/message'">
+      <i class="fa-solid fa-message"></i> Messages
+    </button>
+
+    
+  </div>
+
+  <div class="sidebar-card" style="margin-top: auto;">
+    <small style="display:block; margin-bottom:12px; font-weight:700; text-transform:uppercase; font-size:0.65rem; color:var(--gray);">Current Admin</small>
+    <div class="profile">
+      <div class="avatar">AD</div>
+      <div>
+        <strong>Admin</strong>
+        <small>admin@campusfix.com</small>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div id="dashboard" class="view active">
+    <div class="card">
+      <h1>Dashboard</h1>
+<p style="color:var(--gray); margin:0;">
+    Welcome back, <span id="adminName">Admin</span> 👋. Here is what's happening today.
+</p>
+    </div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+    <div class="stat-info"><span>Total Techs</span><h2 id="totalTechs">0</h2></div>
+  </div>
+  <div class="stat">
+    <div class="stat-icon green"><i class="fa-solid fa-check"></i></div>
+    <div class="stat-info"><span>Active Issues</span><h2 id="activeIssues">0</h2></div>
+  </div>
+  <div class="stat">
+    <div class="stat-icon yellow"><i class="fa-solid fa-clock"></i></div>
+    <div class="stat-info"><span>Pending</span><h2 id="pendingIssues">0</h2></div>
+  </div>
+  <div class="stat">
+    <div class="stat-icon purple"><i class="fa-solid fa-envelope"></i></div>
+    <div class="stat-info"><span>Messages</span><h2 id="messagesCount">0</h2></div>
+  </div>
+</div>
+
+
+<script>
+    async function loadStats() {
+    try {
+        const techRes = await fetch('/admin/techs/count');
+        const techData = await techRes.json();
+        document.getElementById('totalTechs').textContent = techData.success ? techData.total : 0;
+
+        const activeRes = await fetch('/admin/issues/count');
+        const activeData = await activeRes.json();
+        document.getElementById('activeIssues').textContent = activeData.success ? activeData.active : 0;
+
+        const pendingRes = await fetch('/admin/issues/pending');
+        const pendingData = await pendingRes.json();
+        document.getElementById('pendingIssues').textContent = pendingData.success ? pendingData.pending : 0;
+
+        const msgRes = await fetch('/admin/messages/count');
+        const msgData = await msgRes.json();
+        document.getElementById('messagesCount').textContent = msgData.success ? msgData.total : 0;
+
+    } catch (err) {
+        console.error('Error loading stats:', err);
+    }
+}
+
+// Call on page load
+window.addEventListener('DOMContentLoaded', loadStats);
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+    <div class="card">
+      <div class="header-row">
+        <div>
+            <h2 style="margin:0">Technician Management</h2>
+            <p style="color:var(--gray); font-size:0.9rem; margin-top:5px;">Manage your technical staff</p>
+        </div>
+        <div style="display:flex;gap:12px;">
+          <input id="search" class="search" placeholder="Search technicians..." />
+          <button class="btn" id="openModal"><i class="fa-solid fa-plus"></i> Add New</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Technician</th>
+            <th>Contact Info</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="techBody"></tbody>
+      </table>
+
+      <div id="empty" class="empty">
+          <i class="fa-solid fa-user-slash" style="font-size:2rem; display:block; margin-bottom:10px; opacity:0.5;"></i>
+          No technicians added yet.
+      </div>
+    </div>
+
+
+    
+  </div>
+
+<div id="issues" class="view">
+  <div class="card">
+      <div style="display:flex; align-items:center; gap:15px">
+          <button onclick="showPage('dashboard')" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
+              <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <h1>Issues Submitted</h1>
+      </div>
+      <p style="color:var(--gray)">Review and assign maintenance reports.</p>
+  </div>
+
+  <!-- Container for all issue cards -->
+  <div id="issuesContainer"></div>
+</div>
+<script>
+async function loadIssuesForAdmin() {
+    const container = document.getElementById('issuesContainer');
+    container.innerHTML = ''; // Clear old cards
+
+    try {
+        const response = await fetch('/admin/issues');
+        const data = await response.json();
+
+        if (data.success && data.reports.length > 0) {
+            data.reports.forEach(issue => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style = `
+                    text-align:left; 
+                    padding:20px; 
+                    color:var(--gray); 
+                    margin-bottom:20px; 
+                    border:1px solid #ccc; 
+                    border-radius:10px;
+                `;
+
+                card.innerHTML = `
+                    <p><strong>Student:</strong> ${issue.studentName}</p>
+                    <p><strong>Type:</strong> ${issue.issueType}</p>
+                    <p><strong>Location:</strong> ${issue.location}</p>
+                    <p><strong>Description:</strong> ${issue.description}</p>
+                    <p><strong>Status:</strong> ${issue.status}</p>
+                    <p><strong>Submitted At:</strong> ${new Date(issue.created_at).toLocaleString()}</p>
+                    ${issue.photo ? `<img src="/uploads/${issue.photo}" style="max-width:100%; margin-top:10px;" />` : ''}
+                `;
+
+                container.appendChild(card);
+            });
+        } else {
+            container.innerHTML = `
+                <div class="card" style="text-align:center; padding:100px; color:var(--gray)">
+                    <i class="fa-solid fa-clipboard-check" style="font-size:3rem; margin-bottom:20px; opacity:0.2"></i>
+                    <p>No issues submitted yet.</p>
+                </div>
+            `;
+        }
+    } catch (err) {
+        console.error('Error loading issues:', err);
+    }
+}
+
+// Load issues when page loads
+window.addEventListener('DOMContentLoaded', loadIssuesForAdmin);
+</script>
+
+
+
+
+  
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 style="margin-top:0">Add Technician</h2>
+    
+    <label>Full Name</label>
+    <input id="name" placeholder="John Doe" />
+    
+    <label>Email Address</label>
+    <input id="email" type="email" placeholder="john@campusfix.com" />
+    
+    <label>Phone Number</label>
+    <input id="phone" type="tel" placeholder="+1 234 567 890" />
+    
+    <label>Role / Specialization</label>
+    <select id="role">
+        <option value="Electrician">Electrician</option>
+        <option value="Plumber">Plumber</option>
+        <option value="HVAC Specialist">HVAC Specialist</option>
+        <option value="Carpenter">Carpenter</option>
+        <option value="General Tech">General Tech</option>
+    </select>
+
+    <button class="btn" style="width:100%; justify-content:center; margin-top:10px;" id="add">Save Technician</button>
+  </div>
+</div>
+
+<script>
+const modal = document.getElementById("modalBg");
+const body = document.getElementById("techBody");
+const empty = document.getElementById("empty");
+const count = document.getElementById("count");
+let total = 0;
+
+// Page Switching Logic
+function showPage(pageId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    document.getElementById(pageId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+document.getElementById("openModal").onclick = () => modal.style.display = "flex";
+modal.onclick = e => { if(e.target === modal) modal.style.display = "none"; };
+
+document.getElementById("add").onclick = () => {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const phone = document.getElementById("phone").value;
+  const role = document.getElementById("role").value;
+
+  if(!name || !email) return alert("Please fill in Name and Email");
+
+  total++;
+  count.innerText = total;
+  empty.style.display = "none";
+
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>
+        <div style="display:flex; align-items:center; gap:12px; font-weight:600;">
+            <div class="avatar-sm">${name[0]}</div>
+            ${name}
+        </div>
+    </td>
+    <td>
+        <div style="font-size:0.85rem">${email}</div>
+        <div style="font-size:0.75rem; color:var(--gray)">${phone}</div>
+    </td>
+    <td><span style="font-weight:600">${role}</span></td>
+    <td><span class="status">Active</span></td>
+    <td><button class="delete"><i class="fa-solid fa-trash"></i></button></td>
+  `;
+
+  row.querySelector(".delete").onclick = () => {
+    row.remove();
+    total--;
+    count.innerText = total;
+    if(total === 0) empty.style.display = "block";
+  };
+
+  body.appendChild(row);
+  modal.style.display = "none";
+  
+  // Reset fields
+  document.getElementById("name").value = "";
+  document.getElementById("email").value = "";
+  document.getElementById("phone").value = "";
+};
+
+document.getElementById("search").onkeyup = function() {
+  const val = this.value.toLowerCase();
+  [...body.children].forEach(r => {
+    r.style.display = r.innerText.toLowerCase().includes(val) ? "" : "none";
+  });
+};
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/admin-info')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('adminName').textContent = data.adminName;
+            }
+        })
+        .catch(err => console.error(err));
+});
+
+
+
+
+
+
+
+
+
+// Render technician row
+function renderTechRow(t) {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>
+            <div style="display:flex; align-items:center; gap:12px; font-weight:600;">
+                <div class="avatar-sm">${t.name[0]}</div>
+                ${t.name}
+            </div>
+        </td>
+        <td>
+            <div style="font-size:0.85rem">${t.email}</div>
+            <div style="font-size:0.75rem; color:var(--gray)">${t.phone || ''}</div>
+        </td>
+        <td><strong>${t.role || 'General Tech'}</strong></td>
+        <td><span class="status">${t.status}</span></td>
+        <td>
+            <button class="delete">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </td>
+    `;
+
+    row.querySelector(".delete").onclick = () => {
+        fetch(`/api/technicians/${t.id}`, { method: 'DELETE' })
+            .then(() => {
+                row.remove();
+                updateCount();
+            });
+    };
+
+    body.appendChild(row);
+}
+
+
+
+function loadTechnicians() {
+    fetch('/api/technicians')
+        .then(res => res.json())
+        .then(data => {
+            body.innerHTML = '';
+            if (!data.technicians.length) {
+                empty.style.display = 'block';
+                count.textContent = 0;
+                return;
+            }
+
+            empty.style.display = 'none';
+            data.technicians.forEach(renderTechRow);
+            count.textContent = data.technicians.length;
+        });
+}
+
+function updateCount() {
+    const rows = body.children.length;
+    count.textContent = rows;
+    empty.style.display = rows ? 'none' : 'block';
+}
+
+document.addEventListener('DOMContentLoaded', loadTechnicians);
+
+
+
+
+
+document.getElementById("add").onclick = () => {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const role = document.getElementById("role").value;
+
+    if (!name || !email) return alert("Name and Email required");
+
+    fetch('/api/technicians', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, role })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) return alert(data.message);
+
+        renderTechRow(data.technician);
+        updateCount();
+        modal.style.display = "none";
+
+        document.getElementById("name").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("phone").value = "";
+    });
+};
+
+
+document.getElementById("search").onkeyup = function () {
+    const val = this.value.toLowerCase();
+    [...body.children].forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+    });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
