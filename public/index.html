@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Fix | ASTU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=Playfair+Display:ital,wght@1,700&display=swap');
+        
+        :root {
+            --bg: #F9F7F2;
+            --clay: #E8E2D6;
+            --accent: #2D2D2D;
+            --brand: #C84C2C; 
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--accent);
+            overflow-x: hidden;
+        }
+
+        .serif { font-family: 'Playfair Display', serif; }
+
+        /* --- TYPEWRITER CURSOR --- */
+        .cursor::after {
+            content: "|";
+            margin-left: 5px;
+            color: var(--brand);
+            animation: blink 0.8s infinite;
+            font-style: normal;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* --- ENTRANCE ANIMATIONS --- */
+        @keyframes revealUp {
+            0% { opacity: 0; transform: translateY(40px); filter: blur(10px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .reveal {
+            opacity: 0;
+            animation: revealUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+
+        /* --- UI COMPONENTS --- */
+        .neo-card {
+            background: #F9F7F2;
+            border-radius: 24px;
+            box-shadow: 10px 10px 30px #d4d2ce, -10px -10px 30px #ffffff;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .btn-black {
+            background: #1A1A1A;
+            color: #F9F7F2;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .btn-black:hover {
+            transform: translateY(-2px);
+            background: var(--brand);
+            box-shadow: 0 10px 20px rgba(200, 76, 44, 0.2);
+        }
+
+        .image-mask {
+            border-radius: 40px 40px 40px 4px;
+            overflow: hidden;
+            box-shadow: 20px 20px 50px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 550px;
+            aspect-ratio: 4 / 5;
+            margin-left: auto;
+            background-color: #E2E8F0; /* Fallback color */
+        }
+
+        /* Responsive Text */
+        .hero-title {
+            font-size: clamp(2.8rem, 8vw, 6rem);
+            line-height: 1.1;
+        }
+
+        .hero-sub {
+            font-size: clamp(2.2rem, 6vw, 4.8rem);
+            display: inline-block;
+            min-height: 1.2em;
+        }
+    </style>
+</head>
+<body class="selection:bg-orange-200">
+
+    <nav class="flex items-center justify-between px-6 md:px-16 py-8 animate-[fadeIn_1.5s_ease-out]">
+        <div class="text-xl md:text-2xl font-extrabold tracking-tighter flex items-center gap-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#C84C2C]"></div>
+            CAMPUS <span class="font-light italic serif">fix.</span>
+        </div>
+        
+        <div class="hidden lg:flex gap-10 text-[10px] font-bold tracking-[0.2em] uppercase opacity-50">
+            <a href="/how-to-use" class="hover:opacity-100 transition">how-to-use</a>
+            <a href="/ai-support" class="hover:opacity-100 transition">AI Support</a>
+            <a href="/adminlogin" class="hover:opacity-100 transition">Admin</a>
+        </div>
+
+        <button class="border-b-2 border-black pb-1 text-[10px] font-bold tracking-widest hover:text-[#C84C2C] hover:border-[#C84C2C] transition-all uppercase" onclick="window.location.href='/StudLogin'">
+            Student Login
+        </button>
+    </nav>
+
+    <main class="max-w-[1400px] mx-auto px-6 md:px-16 py-8 md:py-16">
+        <div class="grid lg:grid-cols-2 gap-12 md:gap-24 items-center">
+            
+            <div class="space-y-8 md:space-y-12">
+                <div class="space-y-4">
+                    <h4 class="text-[10px] font-bold tracking-[0.4em] uppercase opacity-40 reveal">ASTU Support System</h4>
+                    <h1 class="hero-title font-extrabold tracking-tighter text-[#1A1A1A]">
+                        <span class="reveal delay-1 inline-block">Elegance in</span> <br> 
+                        <span id="typewriter" class="serif font-light italic text-[#C84C2C] hero-sub reveal delay-2 cursor"></span>
+                    </h1>
+                </div>
+
+                <p class="text-lg md:text-xl text-slate-500 leading-relaxed max-w-md font-light reveal delay-3">
+                    Transforming the way Adama University handles infrastructure. A seamless, artful interface for the modern student.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-6 md:gap-10 reveal" style="animation-delay: 0.8s;">
+                    <button class="btn-black px-10 py-5 rounded-2xl font-bold tracking-widest text-[10px] uppercase">
+                        REPORT A FAULT
+                    </button>
+                    <a href="#" class="text-[10px] font-bold border-b border-black/20 hover:border-black transition uppercase tracking-widest">Track Existing</a>
+                </div>
+
+                <div class="pt-10 grid grid-cols-2 gap-6 md:gap-10 border-t border-black/5 reveal" style="animation-delay: 1s;">
+                    <div>
+                        <p class="text-3xl md:text-4xl font-extrabold tracking-tighter">14<span class="text-[#C84C2C] text-2xl">m</span></p>
+                        <p class="text-[9px] font-bold uppercase opacity-40 tracking-widest mt-1">Average Dispatch</p>
+                    </div>
+                    <div>
+                        <p class="text-3xl md:text-4xl font-extrabold tracking-tighter">99<span class="text-[#C84C2C] text-2xl">%</span></p>
+                        <p class="text-[9px] font-bold uppercase opacity-40 tracking-widest mt-1">Resolution Rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative mt-12 lg:mt-0 reveal delay-2">
+                <div class="image-mask">
+                    <img src="https://images.pexels.com/photos/256150/pexels-photo-256150.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                         alt="ASTU Dormitory Concept"
+                         class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+                         onerror="this.src='https://via.placeholder.com/800x1000?text=Campus+Architecture'">
+                </div>
+                
+                <div class="absolute -bottom-8 -left-4 md:-left-10 neo-card p-6 md:p-10 w-60 md:w-72 space-y-3 md:space-y-4 animate-[fadeIn_2s_ease-out_1.2s_both]">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#C84C2C] flex items-center justify-center text-white text-xs">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h5 class="font-extrabold text-xs uppercase tracking-tight">System Status</h5>
+                    <p class="text-[11px] text-slate-500 font-light leading-relaxed">All AI-Agents are operational. Current wait time for maintenance is zero.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="px-6 md:px-16 py-24 bg-[#1A1A1A] text-[#F9F7F2] rounded-[40px] md:rounded-[100px] mt-12 md:mt-24 mb-10 reveal">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-3 gap-12 md:gap-20">
+                <div class="space-y-4 md:space-y-6">
+                    <span class="text-[#C84C2C] text-3xl md:text-4xl serif italic">01.</span>
+                    <h3 class="text-xl md:text-2xl font-bold tracking-tight uppercase">Visual Triage</h3>
+                    <p class="opacity-40 font-light text-sm leading-relaxed">Our system identifies faults using spatial intelligence, ensuring the right specialist is sent.</p>
+                </div>
+                <div class="space-y-4 md:space-y-6">
+                    <span class="text-[#C84C2C] text-3xl md:text-4xl serif italic">02.</span>
+                    <h3 class="text-xl md:text-2xl font-bold tracking-tight uppercase">AI Guidance</h3>
+                    <p class="opacity-40 font-light text-sm leading-relaxed">Immediate troubleshooting advice delivered to your portal, reducing wait times by 40%.</p>
+                </div>
+                <div class="space-y-4 md:space-y-6">
+                    <span class="text-[#C84C2C] text-3xl md:text-4xl serif italic">03.</span>
+                    <h3 class="text-xl md:text-2xl font-bold tracking-tight uppercase">Full Transparency</h3>
+                    <p class="opacity-40 font-light text-sm leading-relaxed">Every step, from reporting to final sign-off, is logged in a secure student ledger.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const words = ["Restoration.", "Innovation.", "Reliability.", "Excellence."];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typewriterElement = document.getElementById("typewriter");
+
+        function type() {
+            const currentWord = words[wordIndex];
+            
+            if (isDeleting) {
+                typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 70 : 150;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                typeSpeed = 2500;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typeSpeed = 500;
+            }
+
+            setTimeout(type, typeSpeed);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(type, 1500); 
+        });
+    </script>
+</body>
+</html>
