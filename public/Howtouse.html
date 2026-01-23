@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Fix | How to Use</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=Playfair+Display:ital,wght@1,700&display=swap');
+        
+        :root {
+            --bg: #F9F7F2;
+            --clay: #E8E2D6;
+            --accent: #2D2D2D;
+            --brand: #C84C2C; 
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--accent);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .serif { font-family: 'Playfair Display', serif; }
+
+        /* --- TYPEWRITER CURSOR --- */
+        .cursor::after {
+            content: "|";
+            margin-left: 5px;
+            color: var(--brand);
+            animation: blink 0.8s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- STEP CARDS --- */
+        .step-card {
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .step-card:hover {
+            background: white;
+            padding-left: 30px;
+            border-bottom-color: var(--brand);
+        }
+
+        .step-num {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 3rem;
+            opacity: 0.1;
+            transition: 0.4s;
+        }
+        .step-card:hover .step-num {
+            opacity: 1;
+            color: var(--brand);
+            transform: scale(1.1);
+        }
+
+        /* --- REVEAL --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-title { font-size: clamp(2.5rem, 7vw, 6rem); line-height: 1.1; }
+        .hero-sub { font-size: clamp(2rem, 5vw, 4.5rem); display: inline-block; min-height: 1.2em; }
+    </style>
+</head>
+<body>
+
+    <nav class="flex items-center justify-between px-6 md:px-16 py-8">
+        <div class="text-xl md:text-2xl font-extrabold tracking-tighter flex items-center gap-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#C84C2C]"></div>
+            CAMPUS <span class="font-light italic serif">fix.</span>
+        </div>
+        <div class="hidden lg:flex gap-10 text-[10px] font-bold tracking-[0.2em] uppercase opacity-50">
+            <a href="/" class="text-black opacity-100 border-b border-black">Home</a>
+            <a href="/ai-support" class="hover:opacity-100 transition">AI Support</a>
+            <a href="/adminlogin" class="hover:opacity-100 transition">Admin</a>
+        </div>
+        <button class="text-[10px] font-bold tracking-widest uppercase">Student Login</button>
+    </nav>
+
+    <header class="max-w-[1400px] mx-auto px-6 md:px-16 py-16 md:py-24">
+        <div class="max-w-4xl">
+            <h4 class="text-[10px] font-bold tracking-[0.4em] uppercase opacity-40 mb-4">ASTU User Guide</h4>
+            <h1 class="hero-title font-extrabold tracking-tighter text-[#1A1A1A]">
+                Elegance in <br>
+                <span id="typewriter" class="serif font-light italic text-[#C84C2C] hero-sub cursor"></span>
+            </h1>
+            <p class="text-xl text-slate-500 font-light mt-8 max-w-xl">
+                A seamless bridge between reported issues and instant solutions, powered by the campus's first spatial AI support engine.
+            </p>
+        </div>
+    </header>
+
+    <section id="how-to-use" class="max-w-[1400px] mx-auto px-6 md:px-16 pb-32">
+        <div class="grid lg:grid-cols-12 gap-16">
+            
+            <div class="lg:col-span-4">
+                <div class="sticky top-24 space-y-6">
+                    <h2 class="text-2xl font-bold tracking-tight">The Protocol</h2>
+                    <p class="text-sm text-slate-400 font-light leading-relaxed">Our workflow prioritizes AI-driven diagnostics to ensure faster resolution times for students and staff.</p>
+                    <div class="h-[1px] w-20 bg-[#C84C2C]"></div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 space-y-4">
+                
+                <div class="step-card p-10 flex flex-col md:flex-row items-start md:items-center gap-8 reveal">
+                    <span class="step-num">01</span>
+                    <div class="flex-1">
+                        <h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-[#C84C2C] mb-2">Diagnostic Phase</h3>
+                        <h2 class="text-2xl font-bold mb-3">AI-First Assessment</h2>
+                        <p class="text-slate-500 font-light text-sm leading-relaxed">
+                            Once you upload a photo, our **Vision AI** instantly scans the image to identify the specific fault. It checks against the ASTU infrastructure database to see if it's a known issue or an emergency.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-card p-10 flex flex-col md:flex-row items-start md:items-center gap-8 reveal">
+                    <span class="step-num">02</span>
+                    <div class="flex-1">
+                        <h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-[#C84C2C] mb-2">Immediate Support</h3>
+                        <h2 class="text-2xl font-bold mb-3">Smart Troubleshooting</h2>
+                        <p class="text-slate-500 font-light text-sm leading-relaxed">
+                            Before dispatching a technician, the AI provides you with instant guidance. If it's a simple reset or a safety precaution, you'll receive a **step-by-step interactive guide** to manage the situation.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-card p-10 flex flex-col md:flex-row items-start md:items-center gap-8 reveal">
+                    <span class="step-num">03</span>
+                    <div class="flex-1">
+                        <h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-[#C84C2C] mb-2">Specialist Phase</h3>
+                        <h2 class="text-2xl font-bold mb-3">Precision Restoration</h2>
+                        <p class="text-slate-500 font-light text-sm leading-relaxed">
+                            If the AI determines a manual fix is required, the diagnostic data is sent directly to the right specialist's tablet. They arrive with the exact tools needed, ensuring the repair is finished in one visit.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-card p-10 flex flex-col md:flex-row items-start md:items-center gap-8 reveal">
+                    <span class="step-num">04</span>
+                    <div class="flex-1">
+                        <h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-[#C84C2C] mb-2">Finalization</h3>
+                        <h2 class="text-2xl font-bold mb-3">Immutable Logging</h2>
+                        <p class="text-slate-500 font-light text-sm leading-relaxed">
+                            Every fix is logged on our digital ledger. You'll receive a notification to verify the "Elegance in Restoration," maintaining high standards across the entire ASTU campus.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Typewriter logic
+        const words = ["Restoration.", "Innovation.", "Reliability.", "Intelligence."];
+        let wordIndex = 0; let charIndex = 0; let isDeleting = false;
+        const typewriterElement = document.getElementById("typewriter");
+
+        function type() {
+            const currentWord = words[wordIndex];
+            typewriterElement.textContent = isDeleting ? currentWord.substring(0, charIndex - 1) : currentWord.substring(0, charIndex + 1);
+            charIndex = isDeleting ? charIndex - 1 : charIndex + 1;
+            let typeSpeed = isDeleting ? 70 : 150;
+            if (!isDeleting && charIndex === currentWord.length) { typeSpeed = 2000; isDeleting = true; }
+            else if (isDeleting && charIndex === 0) { isDeleting = false; wordIndex = (wordIndex + 1) % words.length; typeSpeed = 500; }
+            setTimeout(type, typeSpeed);
+        }
+
+        // Reveal logic
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(type, 1000);
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
+
+
