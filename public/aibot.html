@@ -313,8 +313,8 @@
 
     <script>
         // API Configuration
-        const OPENROUTER_API_KEY = "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";
-        const MODEL = "deepseek/deepseek-r1-0528:free";
+        const OPENROUTER_API_KEY = openRouterApiKey;
+        const MODEL = model;
         
         const thread = document.getElementById('thread');
         const input = document.getElementById('user-input');
@@ -437,7 +437,6 @@ Always respond quickly with practical solutions.`
         function toggleSidebar() { 
             document.getElementById('sidebar').classList.toggle('open'); 
         }
-
         function toggleKnowledgePanel() {
             const panel = document.getElementById('knowledge-panel');
             panel.classList.toggle('hidden');
