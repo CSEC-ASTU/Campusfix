@@ -25,7 +25,7 @@
         .dark .sidebar { background: #121212; border-right: 1px solid #1F1F1F; }
         .dark .glass-card { background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); }
 
-        .glass-blur { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glass-blur { backdrop-filter: blur(12px); -webkit-backflow-filter: blur(12px); }
         .glass-card {
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(0, 0, 0, 0.05);
@@ -186,15 +186,16 @@
             0%, 100% { transform: scaleY(0.5); }
             50% { transform: scaleY(1); }
         }
-        
-        /* Quick response styles */
-        .quick-response {
-            animation: quickSlideIn 0.2s ease-out;
+
+        /* FAQ Suggestions */
+        .faq-suggestion {
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
         
-        @keyframes quickSlideIn {
-            from { transform: translateY(8px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .faq-suggestion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -250,7 +251,7 @@
                     <div class="glass-card glass-blur p-6 rounded-3xl rounded-tl-none flex-1 ai-response">
                         <h2 class="text-xl font-bold mb-2">Welcome to CampusFix AI Assistant</h2>
                         <p class="text-sm opacity-70 mb-3">I'm here to help you with campus-related issues at Adama Science and Technology University. Whether you need to report a problem, get information about facilities, or seek guidance on campus services, I'm ready to assist.</p>
-                        <p class="text-xs opacity-50 mt-2">Chat Mode: Full AI Assistance | FAQ Mode: Quick Campus Answers</p>
+                        <p class="text-xs opacity-50 mt-2">AI Assistant | Version 1.2 | DeepSeek Integration</p>
                     </div>
                 </div>
             </div>
@@ -313,8 +314,16 @@
 
     <script>
         // API Configuration
-        const OPENROUTER_API_KEY = openRouterApiKey;
-        const MODEL = model;
+        async function askAI(message) {
+  const res = await fetch("/api/ai-support", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message })
+  });
+
+  const data = await res.json();
+  console.log(data.reply);
+}
         
         const thread = document.getElementById('thread');
         const input = document.getElementById('user-input');
@@ -324,99 +333,330 @@
         let conversationHistory = [
             {
                 role: "system",
-                content: `You are CampusFix AI, an assistant for Adama Science and Technology University (ASTU) students.
+                content: `You are CampusFix AI, an intelligent assistant for Adama Science and Technology University (ASTU) students and staff.
 
-Respond with clean, professional language without markdown formatting (no **, ###, →, or other markdown symbols).
+MISSION: Provide accurate, helpful, and practical solutions for campus-related issues.
 
-Write in a friendly, helpful tone with clear structure:
-- Use proper paragraphs
-- Use bullet points with • symbol
-- Use clear headings without markdown
-- Write concise, actionable advice
-- Keep responses focused on campus matters
+AREA OF EXPERTISE:
+1. Campus Facilities & Maintenance
+2. Dormitory Issues & Housing
+3. Academic Building Concerns
+4. Student Services & Support
+5. Emergency Procedures
+6. Campus Regulations & Policies
 
-Always respond quickly with practical solutions.`
+WRITING STYLE GUIDELINES:
+- Be professional yet approachable
+- Use clear, concise language
+- Organize information with bullet points when listing items
+- Highlight important details using emphasis
+- Provide actionable steps in chronological order
+- Include relevant contact information when appropriate
+- Acknowledge limitations and suggest escalation paths
+- Maintain a helpful, solution-oriented tone
+
+RESPONSE STRUCTURE:
+1. Acknowledge the issue/question
+2. Provide relevant information/solutions
+3. Offer additional resources if available
+4. Suggest next steps
+
+EMERGENCY PROTOCOL: For urgent safety issues, always recommend contacting campus security immediately.
+
+Be factual, helpful, and focused on practical campus solutions.`
             }
         ];
         let isProcessing = false;
         let chatMode = "chat"; // "chat" | "faq"
 
-        // FAQ Database - 15 predefined Q&As
+        // FAQ Database with 15 questions and answers
         const faqDatabase = [
             {
-                keywords: ["hello", "hi", "hey", "greetings"],
-                question: "General greeting",
-                answer: "Hi there! Welcome back to CampusFix AI Assistant. 😊\n\nI'm here to help you with campus-related issues at Adama Science and Technology University. You can ask me about dormitory problems, maintenance requests, campus facilities, or any other campus concerns.\n\nHow can I assist you today?"
+                question: "How do I report a dormitory maintenance issue?",
+                keywords: ["dorm", "room", "hostel", "maintenance", "repair", "broken", "leak", "electricity", "water"],
+                answer: `<p><strong>Dormitory Maintenance Reporting</strong></p>
+<p>To report dormitory maintenance issues at ASTU:</p>
+<ol>
+<li>Visit the Housing Office in Administration Building, Room 101</li>
+<li>Fill out the Maintenance Request Form (available at the office)</li>
+<li>Provide specific details: room number, building, nature of issue</li>
+<li>For urgent issues (water leaks, electrical problems), call: <strong>+251-978-586-213</strong></li>
+<li>Online reporting: maintenance.astu.edu.et (requires student login)</li>
+</ol>
+<div class="info-block">
+<strong>Response Times:</strong><br>
+• Emergency: Within 2 hours<br>
+• Urgent: Within 24 hours<br>
+• Routine: 3-5 business days
+</div>`
             },
             {
-                keywords: ["dormitory", "dorm", "room", "hostel", "housing", "accommodation"],
-                question: "Dormitory maintenance issues",
-                answer: "For dormitory maintenance at ASTU:\n\n1. Report Immediately:\nContact your Dormitory Supervisor or Floor Representative right away.\nFor urgent safety issues, call ASTU Housing Office: +251 22 111 0000 (ext. 221).\n\n2. Submit Maintenance Form:\nVisit the Housing & Accommodation Office (Admin Building, Room 101).\nFill out a repair/replacement form with:\n• Your name and ID number\n• Dorm name and room number\n• Specific issue details (e.g., 'Bed frame broken - needs replacement')\n\n3. Follow Up:\nIssues typically resolved in 3-5 working days.\nIf not resolved, email: housing@astu.edu.et with your request details.\n\nFor safety emergencies with immediate danger, contact Campus Security immediately."
+                question: "What are the library opening hours?",
+                keywords: ["library", "hours", "open", "close", "book", "study", "research"],
+                answer: `<p><strong>ASTU Library Hours</strong></p>
+<p>The main library operates on the following schedule:</p>
+<ul>
+<li><strong>Regular Semester:</strong> 8:00 AM - 10:00 PM (Monday-Saturday)</li>
+<li><strong>Examination Period:</strong> 7:00 AM - 12:00 AM (7 days a week)</li>
+<li><strong>Holidays:</strong> 9:00 AM - 5:00 PM (Check notice for exceptions)</li>
+<li><strong>Digital Section:</strong> 24/7 access via library.astu.edu.et</li>
+</ul>
+<p><strong>Special Sections:</strong></p>
+<ul>
+<li>Reference Section: 8:30 AM - 6:00 PM</li>
+<li>Periodicals: 9:00 AM - 5:00 PM</li>
+<li>Group Study Rooms: Reservable online</li>
+</ul>`
             },
             {
-                keywords: ["maintenance", "repair", "fix", "broken", "damaged"],
-                question: "General maintenance requests",
-                answer: "ASTU Maintenance Procedures:\n\n1. Submit Request:\n• Online Portal: maintenance.astu.edu.et (student login required)\n• In-person: Facilities Management Office, Technical Building\n• Emergency Line: Call extension 222 from any campus phone\n\n2. Priority Response Times:\n• Emergency: 2 hours or less (safety hazards)\n• High Priority: 24 hours (critical functionality)\n• Standard: 3-5 business days (routine maintenance)\n\n3. Required Information:\n• Exact location (building, floor, room number)\n• Nature of the problem\n• Photographic evidence if possible\n• Urgency level\n• Your contact information"
+                question: "How do I apply for campus accommodation?",
+                keywords: ["accommodation", "apply", "housing", "dormitory", "room", "hostel", "application"],
+                answer: `<p><strong>Campus Accommodation Application Process</strong></p>
+<p>Follow these steps to apply for campus accommodation:</p>
+<ol>
+<li>Complete the online application at housing.astu.edu.et</li>
+<li>Submit required documents: ID copy, admission letter, passport photo</li>
+<li>Pay accommodation fee at the Finance Office (Building C, Room 205)</li>
+<li>Submit payment receipt to Housing Office</li>
+<li>Receive room allocation within 5-7 business days</li>
+</ol>
+<div class="info-block">
+<strong>Important Deadlines:</strong><br>
+• New Students: Within 2 weeks of admission<br>
+• Returning Students: Before end of previous semester<br>
+• Priority given to students from distant regions
+</div>`
             },
             {
-                keywords: ["library", "book", "study", "research", "reading"],
-                question: "Library services and resources",
-                answer: "ASTU Library Services:\n\nOperating Hours:\n• Regular Semester: 8:00 AM - 10:00 PM (Mon-Sat)\n• Examination Period: 7:00 AM - 12:00 AM (Mon-Sun)\n• Holidays: 9:00 AM - 5:00 PM (check schedule)\n\nAvailable Services:\n• Study Rooms: Reservable online up to 7 days in advance\n• Book Loans: 2 weeks for undergraduates, 4 weeks for postgraduates\n• Digital Resources: Access via library.astu.edu.et/digital\n• Research Assistance: Reference Desk on 2nd floor\n• Printing Services: Available at ground floor terminal\n\nContact: library@astu.edu.et | Extension: 333"
+                question: "Where is the health center located and what services are offered?",
+                keywords: ["health", "clinic", "medical", "doctor", "sick", "illness", "medicine"],
+                answer: `<p><strong>Campus Health Center Services</strong></p>
+<p>The ASTU Health Center is located in Building F, Ground Floor (near the Student Union Building).</p>
+<p><strong>Services Available:</strong></p>
+<ul>
+<li>General medical consultations (free for registered students)</li>
+<li>Emergency first aid and treatment</li>
+<li>Laboratory tests at subsidized rates</li>
+<li>Medication dispensing</li>
+<li>Referral services to Adama Hospital</li>
+</ul>
+<div class="info-block">
+<strong>Operating Hours:</strong><br>
+• Monday-Friday: 8:30 AM - 5:30 PM<br>
+• Saturday: 9:00 AM - 1:00 PM<br>
+• Emergency Contact: +251-911-234-567 (24/7)
+</div>`
             },
             {
-                keywords: ["wifi", "wi-fi", "internet", "network", "connection"],
-                question: "Campus network and WiFi issues",
-                answer: "Campus Network Support:\n\nIT Help Desk:\n• Location: ICT Building, Ground Floor\n• Hours: 7:30 AM - 6:00 PM\n• Emergency: extension 333\n• Online Portal: helpdesk.astu.edu.et\n\nWi-Fi Troubleshooting:\n1. Forget network and reconnect\n2. Restart your device\n3. Check network status at status.astu.edu.et\n4. Visit IT Help Desk for assistance\n\nNetwork issues are typically resolved within 24 hours. For urgent connectivity problems affecting academic work, mention this when reporting."
+                question: "How do I get my student ID card?",
+                keywords: ["id", "card", "student id", "identification", "photo", "card", "registration"],
+                answer: `<p><strong>Student ID Card Issuance</strong></p>
+<p>To obtain your ASTU student ID card:</p>
+<ol>
+<li>Complete course registration at your department</li>
+<li>Submit 2 passport-size photos to Registrar's Office (Admin Building, Room 105)</li>
+<li>Pay ID processing fee at Finance Office (200 ETB)</li>
+<li>Collect ID after 3-5 working days</li>
+</ol>
+<p><strong>For lost ID cards:</strong></p>
+<ul>
+<li>Report immediately to Security Office</li>
+<li>Submit police report if required</li>
+<li>Apply for replacement (500 ETB fee)</li>
+<li>Processing time: 7 working days</li>
+</ul>`
             },
             {
-                keywords: ["security", "emergency", "safety", "danger", "urgent"],
-                question: "Campus security and emergencies",
-                answer: "For Campus Security and Emergencies:\n\nImmediate Contacts:\n• Campus Security (24/7): +251 22 111 1111\n• Emergency Extension: 111 from any campus phone\n• Health Services: Extension 444\n\nWhen to Contact Security:\n• Safety hazards in buildings\n• Medical emergencies\n• Security threats\n• Fire incidents\n• Electrical hazards\n\nAlways report emergencies immediately. For non-urgent security concerns, visit the Security Office in the Administration Building."
+                question: "What dining options are available on campus?",
+                keywords: ["food", "dining", "cafeteria", "meal", "eat", "restaurant", "canteen"],
+                answer: `<p><strong>Campus Dining Facilities</strong></p>
+<p>ASTU offers several dining options:</p>
+<ul>
+<li><strong>Main Cafeteria:</strong> Building G (7:00 AM - 8:00 PM)</li>
+<li><strong>Student Union Café:</strong> 24-hour service during exams</li>
+<li><strong>Faculty Restaurant:</strong> Building D (for staff and guests)</li>
+<li><strong>Snack Bars:</strong> Library (Ground floor) and Sports Complex</li>
+</ul>
+<div class="info-block">
+<strong>Meal Plans Available:</strong><br>
+• Breakfast: 15-25 ETB<br>
+• Lunch/Dinner: 35-50 ETB<br>
+• Monthly Meal Plan: 1,800 ETB (subsidized for needy students)
+</div>`
             },
             {
-                keywords: ["registration", "enrollment", "course", "academic"],
-                question: "Academic registration and courses",
-                answer: "Academic Registration at ASTU:\n\n1. Online Registration:\n• Portal: portal.astu.edu.et\n• Required: Student ID and password\n• Dates: Check academic calendar\n\n2. In-person Assistance:\n• Registrar's Office: Admin Building, Room 301\n• Hours: 8:30 AM - 5:00 PM (Weekdays)\n• Contact: registrar@astu.edu.et\n\n3. Common Issues:\n• Course conflicts: Contact your Department Head\n• Registration errors: Visit Registrar's Office\n• Payment issues: Finance Office, Room 201\n\nRegistration periods are announced on the university website and notice boards."
+                question: "How do I report a campus security issue?",
+                keywords: ["security", "safety", "emergency", "theft", "robbery", "fight", "danger"],
+                answer: `<p><strong>Campus Security Reporting</strong></p>
+<p>For security concerns at ASTU:</p>
+<ol>
+<li><strong>Emergency:</strong> Call 911 from any campus phone or +251-911-111-111</li>
+<li><strong>Security Office:</strong> Building S (near main gate), open 24/7</li>
+<li><strong>Online Reporting:</strong> security.astu.edu.et (anonymous option available)</li>
+</ol>
+<div class="info-block">
+<strong>Immediate Response For:</strong><br>
+• Medical emergencies<br>
+• Fire incidents<br>
+• Security threats<br>
+• Serious accidents<br>
+• Crime in progress
+</div>`
             },
             {
-                keywords: ["payment", "fee", "tuition", "finance", "money"],
-                question: "Fee payment and financial matters",
-                answer: "Fee Payment Information:\n\nPayment Methods:\n1. Bank Transfer:\n• Commercial Bank of Ethiopia\n• Account: 100023456789\n• Reference: Your Student ID\n\n2. Online Payment:\n• Portal: payment.astu.edu.et\n• Accepted: Telebirr, CBE Birr, Bank Cards\n\n3. Cash Payment:\n• Finance Office: Admin Building, Room 201\n• Hours: 9:00 AM - 4:00 PM\n\nDeadlines:\n• Semester fees: Due within first 2 weeks\n• Late payment: 5% penalty\n• Installment plans: Available upon request\n\nContact: finance@astu.edu.et | Extension: 201"
+                question: "What are the campus internet access points?",
+                keywords: ["wifi", "internet", "network", "connect", "password", "online", "computer"],
+                answer: `<p><strong>Campus Internet Access</strong></p>
+<p>ASTU provides wireless internet across campus:</p>
+<ul>
+<li><strong>WiFi Network:</strong> ASTU-STUDENT (password: astu2024)</li>
+<li><strong>Computer Labs:</strong> Library (50 PCs), ICT Building (100 PCs)</li>
+<li><strong>24/7 Access:</strong> Library basement study area</li>
+</ul>
+<p><strong>Registration Required:</strong> First-time users must register at:</p>
+<ol>
+<li>Connect to ASTU-STUDENT network</li>
+<li>Open browser and enter student ID</li>
+<li>Accept terms and conditions</li>
+<li>Access granted within 5 minutes</li>
+</ol>`
             },
             {
-                keywords: ["transport", "bus", "shuttle", "commute"],
-                question: "Campus transportation services",
-                answer: "Campus Transportation:\n\nShuttle Services:\n• Routes: Main Campus ↔ City Center ↔ Satellite Campuses\n• Schedule: 6:00 AM - 10:00 PM daily\n• Frequency: Every 30 minutes during peak hours\n• Cost: Free for registered students\n\nBus Stops:\n1. Main Gate (Primary stop)\n2. Library Building\n3. Engineering Block\n4. Dormitory Area\n\nSpecial Services:\n• Evening shuttles for library users\n• Weekend reduced schedule\n• Exam period extended hours\n\nFor schedule changes or issues, contact Transport Office: extension 555"
+                question: "How do I register for courses each semester?",
+                keywords: ["register", "registration", "courses", "semester", "classes", "enroll", "schedule"],
+                answer: `<p><strong>Course Registration Process</strong></p>
+<p>Follow these steps for course registration:</p>
+<ol>
+<li>Check academic calendar for registration dates</li>
+<li>Meet with academic advisor for course selection</li>
+<li>Log into student portal: portal.astu.edu.et</li>
+<li>Select courses from available list</li>
+<li>Pay tuition fees at Finance Office</li>
+<li>Submit payment receipt to Department Office</li>
+</ol>
+<div class="info-block">
+<strong>Important Dates (Fall 2024):</strong><br>
+• Registration Opens: September 2, 2024<br>
+• Registration Closes: September 16, 2024<br>
+• Late Registration: Until September 23 (with penalty)
+</div>`
             },
             {
-                keywords: ["cafeteria", "food", "dining", "meal", "restaurant"],
-                question: "Campus dining and cafeteria services",
-                answer: "Campus Dining Services:\n\nCafeteria Locations:\n1. Main Cafeteria: Near Administration Building\n2. Engineering Cafeteria: Engineering Block\n3. Dormitory Cafeteria: Dormitory Area\n\nOperating Hours:\n• Breakfast: 7:00 AM - 9:30 AM\n• Lunch: 12:00 PM - 2:30 PM\n• Dinner: 6:00 PM - 8:30 PM\n\nMeal Plans:\n• Daily passes available\n• Semester meal plans\n• Special dietary options\n\nPayment:\n• Student ID card\n• Cash payments accepted\n• Mobile money\n\nContact: catering@astu.edu.et | Extension: 666"
+                question: "Where can I find sport facilities on campus?",
+                keywords: ["sports", "gym", "exercise", "football", "basketball", "swimming", "fitness"],
+                answer: `<p><strong>Campus Sports Facilities</strong></p>
+<p>ASTU offers comprehensive sports facilities:</p>
+<ul>
+<li><strong>Main Stadium:</strong> Football field with 5,000 capacity</li>
+<li><strong>Indoor Gymnasium:</strong> Basketball, volleyball, badminton</li>
+<li><strong>Fitness Center:</strong> Weight training, cardio equipment</li>
+<li><strong>Swimming Pool:</strong> Olympic size (open June-September)</li>
+<li><strong>Tennis Courts:</strong> 4 clay courts</li>
+</ul>
+<div class="info-block">
+<strong>Access Requirements:</strong><br>
+• Students: Free with valid ID<br>
+• Staff: 50 ETB monthly membership<br>
+• Hours: 6:00 AM - 9:00 PM (Weekdays)<br>
+          8:00 AM - 6:00 PM (Weekends)
+</div>`
             },
             {
-                keywords: ["health", "medical", "clinic", "doctor", "sick"],
-                question: "Campus health services",
-                answer: "Campus Health Services:\n\nUniversity Clinic:\n• Location: Near Dormitory Area\n• Hours: 8:00 AM - 8:00 PM (Mon-Sat)\n• Emergency: 24/7 on-call doctor\n• Phone: Extension 444\n\nServices Provided:\n• Basic medical consultations\n• Emergency first aid\n• Prescription medications\n• Referrals to hospitals\n\nEmergency Protocol:\n1. Call Campus Security (111) for emergencies\n2. They will dispatch medical help\n3. After-hours: Referral to Adama Hospital\n\nHealth insurance information available at the clinic. Bring your student ID for all visits."
+                question: "How do I access online learning platforms?",
+                keywords: ["online", "learning", "moodle", "platform", "elearning", "virtual", "class"],
+                answer: `<p><strong>Online Learning Platforms at ASTU</strong></p>
+<p>The university uses Moodle for online learning:</p>
+<ol>
+<li>Access via: elearning.astu.edu.et</li>
+<li>Login with student ID and password</li>
+<li>Enroll in courses as per registration</li>
+<li>Download materials and submit assignments</li>
+</ol>
+<p><strong>Available Features:</strong></p>
+<ul>
+<li>Course materials and lecture notes</li>
+<li>Assignment submission portal</li>
+<li>Discussion forums</li>
+<li>Online quizzes and exams</li>
+<li>Grade tracking</li>
+</ul>`
             },
             {
-                keywords: ["sports", "gym", "fitness", "athletic", "exercise"],
-                question: "Sports and recreational facilities",
-                answer: "Campus Sports Facilities:\n\nAvailable Facilities:\n• Main Gymnasium: Basketball, volleyball, badminton\n• Football Field: With track facilities\n• Tennis Courts: 4 courts available\n• Swimming Pool: Seasonal operation\n• Fitness Center: Weight training equipment\n\nAccess:\n• Open to all students\n• Student ID required\n• Hours: 6:00 AM - 9:00 PM\n• Some facilities require booking\n\nSports Teams:\n• Football, basketball, volleyball teams\n• Tryouts each semester\n• Inter-university competitions\n\nContact: sports@astu.edu.et | Extension: 777"
+                question: "What transportation options are available to/from campus?",
+                keywords: ["transport", "bus", "taxi", "travel", "commute", "vehicle", "parking"],
+                answer: `<p><strong>Campus Transportation Services</strong></p>
+<p>ASTU offers several transportation options:</p>
+<ul>
+<li><strong>University Shuttle:</strong> Free service between main campus and satellite campuses (every 30 minutes)</li>
+<li><strong>City Bus Route:</strong> Route 12 stops at main gate (every 15 minutes)</li>
+<li><strong>Taxi Service:</strong> Designated taxi stand near main gate</li>
+<li><strong>Bicycle Rental:</strong> Available at Student Union (50 ETB/day)</li>
+</ul>
+<div class="info-block">
+<strong>Parking Facilities:</strong><br>
+• Student Parking: Area P (500 ETB/semester)<br>
+• Visitor Parking: Main gate area (20 ETB/hour)<br>
+• Bicycle Parking: Free racks at all buildings
+</div>`
             },
             {
-                keywords: ["internship", "placement", "career", "job", "employment"],
-                question: "Internship and career services",
-                answer: "Career and Internship Services:\n\nCareer Development Center:\n• Location: Student Services Building, 2nd Floor\n• Hours: 8:30 AM - 5:00 PM\n• Contact: career@astu.edu.et\n\nServices:\n1. Internship Placements:\n• Industry partnerships\n• Application assistance\n• Documentation support\n\n2. Career Counseling:\n• Resume building\n• Interview preparation\n• Career path guidance\n\n3. Job Fairs:\n• Biannual campus recruitment\n• Industry networking events\n• Alumni connections\n\nUpcoming deadlines and opportunities posted on career.astu.edu.et"
+                question: "How do I apply for financial aid or scholarships?",
+                keywords: ["financial aid", "scholarship", "bursary", "funding", "grant", "loan", "money"],
+                answer: `<p><strong>Financial Aid and Scholarships</strong></p>
+<p>ASTU offers several financial support options:</p>
+<ul>
+<li><strong>Need-Based Bursary:</strong> Apply at Student Affairs Office</li>
+<li><strong>Academic Scholarships:</strong> Automatic for top 5% GPA</li>
+<li><strong>Government Loan:</strong> Apply through Higher Education Bureau</li>
+<li><strong>Emergency Fund:</strong> For unexpected financial crises</li>
+</ul>
+<div class="info-block">
+<strong>Application Requirements:</strong><br>
+• Completed application form<br>
+• Proof of family income<br>
+• Academic transcripts<br>
+• Recommendation letter from department<br>
+• Deadline: October 31 each year
+</div>`
             },
             {
-                keywords: ["graduation", "graduating", "completion", "degree"],
-                question: "Graduation procedures and requirements",
-                answer: "Graduation Information:\n\nRequirements:\n• Complete all credit hours\n• Clear all financial obligations\n• Return all library materials\n• Submit final project/thesis\n\nApplication Process:\n1. Submit graduation application online\n2. Pay graduation fee\n3. Attend clearance process\n4. Receive approval from all departments\n\nImportant Dates:\n• Application deadline: Check academic calendar\n• Clearance period: 2 weeks before graduation\n• Ceremony dates: Announced semester end\n\nDocuments Needed:\n• Completed application form\n• Payment receipt\n• Library clearance certificate\n• Department approval letter\n\nContact: graduation@astu.edu.et | Extension: 888"
+                question: "What career services are available for students?",
+                keywords: ["career", "job", "internship", "employment", "placement", "cv", "resume"],
+                answer: `<p><strong>Career Development Services</strong></p>
+<p>The Career Center (Building H, Room 301) offers:</p>
+<ul>
+<li><strong>CV/Resume Writing:</strong> Workshops every Wednesday</li>
+<li><strong>Job Placement:</strong> Campus recruitment drives</li>
+<li><strong>Internship Programs:</strong> Industry partnerships</li>
+<li><strong>Career Counseling:</strong> One-on-one sessions</li>
+<li><strong>Mock Interviews:</strong> Practice with HR professionals</li>
+</ul>
+<p><strong>Upcoming Events:</strong></p>
+<ol>
+<li>Career Fair: November 15-17, 2024</li>
+<li>CV Workshop: Every Wednesday, 3:00 PM</li>
+<li>Industry Visits: Monthly to local companies</li>
+</ol>`
             },
             {
-                keywords: ["contact", "phone", "email", "address", "location"],
-                question: "Contact information for campus offices",
-                answer: "ASTU Campus Contacts:\n\nKey Departments:\n1. Administration:\n• Main Office: +251 22 111 0000\n• Email: info@astu.edu.et\n\n2. Student Affairs:\n• Phone: Extension 200\n• Email: studentaffairs@astu.edu.et\n• Location: Admin Building, Room 202\n\n3. Academic Office:\n• Phone: Extension 300\n• Email: academic@astu.edu.et\n\n4. Finance Office:\n• Phone: Extension 201\n• Email: finance@astu.edu.et\n\n5. Housing Office:\n• Phone: Extension 221\n• Email: housing@astu.edu.et\n\nEmergency Contacts:\n• Security: 111 (campus phone) or +251 22 111 1111\n• Medical: 444 (campus phone)\n• Fire: 999 (campus phone)"
+                question: "How do I join student clubs and organizations?",
+                keywords: ["club", "organization", "society", "group", "extracurricular", "activity", "join"],
+                answer: `<p><strong>Student Clubs and Organizations</strong></p>
+<p>ASTU has over 30 active student clubs:</p>
+<ul>
+<li><strong>Academic Clubs:</strong> Engineering Society, Science Club</li>
+<li><strong>Cultural Groups:</strong> Music, Drama, Dance</li>
+<li><strong>Sports Clubs:</strong> Football, Basketball, Athletics</li>
+<li><strong>Special Interest:</strong> Debate, Photography, Environment</li>
+</ul>
+<div class="info-block">
+<strong>How to Join:</strong><br>
+1. Visit Student Union Office (Building U)<br>
+2. Browse club listings and meeting schedules<br>
+3. Attend introductory meetings<br>
+4. Register with club secretary<br>
+5. Annual membership fee: 100-200 ETB
+</div>`
             }
         ];
 
@@ -424,6 +664,7 @@ Always respond quickly with practical solutions.`
         document.addEventListener('DOMContentLoaded', () => {
             loadChatHistory();
             updateLLMStatus();
+            updateInputPlaceholder();
         });
 
         function toggleTheme() {
@@ -437,6 +678,7 @@ Always respond quickly with practical solutions.`
         function toggleSidebar() { 
             document.getElementById('sidebar').classList.toggle('open'); 
         }
+
         function toggleKnowledgePanel() {
             const panel = document.getElementById('knowledge-panel');
             panel.classList.toggle('hidden');
@@ -448,9 +690,54 @@ Always respond quickly with practical solutions.`
         function toggleChatMode() {
             chatMode = chatMode === "chat" ? "faq" : "chat";
             document.getElementById("mode-btn").innerText = "MODE: " + chatMode.toUpperCase();
+            updateInputPlaceholder();
+            
+            // Show mode-specific welcome message
+            if (chatMode === "faq") {
+                showFAQWelcome();
+            }
+        }
+
+        function updateInputPlaceholder() {
             input.placeholder = chatMode === "faq"
-                ? "FAQ Mode: Ask common campus questions (fast response)..."
-                : "Chat Mode: Describe any campus issue (AI-powered)...";
+                ? "Ask FAQ questions about campus services (e.g., library hours, dorm issues)..."
+                : "Describe your campus issue or question (AI will generate response)...";
+        }
+
+        function showFAQWelcome() {
+            // Check if FAQ welcome already shown in current session
+            const existingWelcome = document.querySelector('.faq-welcome-message');
+            if (existingWelcome) return;
+
+            const welcomeMsg = document.createElement('div');
+            welcomeMsg.className = "flex gap-4 message-anim faq-welcome-message";
+            welcomeMsg.innerHTML = `
+                <div class="w-10 h-10 rounded-xl bg-[#C84C2C] text-white flex items-center justify-center shrink-0 shadow-lg">
+                    <i class="fas fa-question-circle text-sm"></i>
+                </div>
+                <div class="glass-card glass-blur p-6 rounded-3xl rounded-tl-none flex-1 ai-response">
+                    <h2 class="text-lg font-bold mb-2">FAQ Mode Activated</h2>
+                    <p class="text-sm opacity-70 mb-3">I'm now in FAQ mode. Ask me about common campus topics like:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+                        ${faqDatabase.slice(0, 8).map(faq => `
+                            <div onclick="setInputFromFAQ('${faq.question.replace(/'/g, "\\'")}')" 
+                                 class="faq-suggestion p-3 bg-gray-50 dark:bg-zinc-800 rounded-xl text-xs cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700 transition">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-lightbulb text-[#C84C2C] text-xs"></i>
+                                    <span class="truncate">${faq.question}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            thread.appendChild(welcomeMsg);
+            scrollToBottom();
+        }
+
+        function setInputFromFAQ(question) {
+            input.value = question;
+            input.focus();
         }
 
         function updateLLMStatus() {
@@ -458,7 +745,7 @@ Always respond quickly with practical solutions.`
             const info = document.getElementById('llm-info');
             badge.className = 'status-badge status-online';
             badge.textContent = 'Online';
-            info.textContent = 'DeepSeek R1 0528 | Real-time AI';
+            info.textContent = chatMode === 'chat' ? 'DeepSeek R1 0528 | Real-time AI' : 'Local FAQ Database';
         }
 
         async function loadKnowledgeBase() {
@@ -466,54 +753,33 @@ Always respond quickly with practical solutions.`
             content.innerHTML = `
                 <div class="space-y-4">
                     <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
-                        <h4 class="font-bold mb-2 text-[#C84C2C]">CampusFix Modes Explained</h4>
-                        <div class="text-sm space-y-3 opacity-80">
-                            <div>
-                                <h5 class="font-bold text-[#C84C2C]">Chat Mode (AI-Powered):</h5>
-                                <ul class="ml-4 mt-1 space-y-1">
-                                    <li>• Uses DeepSeek AI via OpenRouter</li>
-                                    <li>• Handles complex, unique questions</li>
-                                    <li>• Provides detailed, contextual responses</li>
-                                    <li>• Slightly slower response time</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-[#C84C2C]">FAQ Mode (Local Database):</h5>
-                                <ul class="ml-4 mt-1 space-y-1">
-                                    <li>• Uses 15 predefined Q&As</li>
-                                    <li>• Instant response time</li>
-                                    <li>• Covers common campus topics</li>
-                                    <li>• No markdown formatting</li>
-                                </ul>
-                            </div>
+                        <h4 class="font-bold mb-2 text-[#C84C2C]">CampusFix AI Assistant Features</h4>
+                        <ul class="text-sm space-y-2 opacity-80">
+                            <li class="flex items-start gap-2"><span class="text-[#C84C2C]">•</span> <span>Campus issue reporting and tracking assistance</span></li>
+                            <li class="flex items-start gap-2"><span class="text-[#C84C2C]">•</span> <span>Dormitory maintenance guidance and protocols</span></li>
+                            <li class="flex items-start gap-2"><span class="text-[#C84C2C]">•</span> <span>Academic facility information and support</span></li>
+                            <li class="flex items-start gap-2"><span class="text-[#C84C2C]">•</span> <span>Campus service contact directories</span></li>
+                            <li class="flex items-start gap-2"><span class="text-[#C84C2C]">•</span> <span>Emergency procedure guidance</span></li>
+                            <li class="flex items-start gap-2"><span class="text-[#C84C2C]">•</span> <span>FAQ repository for common campus issues</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
+                        <h4 class="font-bold mb-2 text-[#C84C2C]">Available Modes</h4>
+                        <div class="text-xs opacity-70 space-y-2">
+                            <p><strong>Chat Mode:</strong> Uses AI to generate responses for any campus-related queries</p>
+                            <p><strong>FAQ Mode:</strong> Provides instant answers from our curated database of 15 common questions</p>
                         </div>
                     </div>
                     
                     <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
                         <h4 class="font-bold mb-2 text-[#C84C2C]">FAQ Topics Available</h4>
-                        <div class="text-xs opacity-70 space-y-2">
-                            <p>15 predefined topics include:</p>
-                            <ul class="grid grid-cols-2 gap-1">
-                                <li>• Dormitory Issues</li>
-                                <li>• Maintenance</li>
-                                <li>• Library Services</li>
-                                <li>• WiFi & Internet</li>
-                                <li>• Campus Security</li>
-                                <li>• Registration</li>
-                                <li>• Fee Payment</li>
-                                <li>• Transportation</li>
-                                <li>• Cafeteria</li>
-                                <li>• Health Services</li>
-                                <li>• Sports Facilities</li>
-                                <li>• Internships</li>
-                                <li>• Graduation</li>
-                                <li>• Contact Info</li>
-                                <li>• General Help</li>
-                            </ul>
+                        <div class="text-xs opacity-70 space-y-1">
+                            ${faqDatabase.map(faq => `<div class="flex items-center gap-2"><span class="text-[#C84C2C]">•</span> <span>${faq.question}</span></div>`).join('')}
                         </div>
                     </div>
                     
-                    <p class="text-xs opacity-50 pt-4 border-t dark:border-zinc-700">Switch between modes using the MODE button. FAQ mode provides instant answers for common questions, while Chat mode handles complex or unique situations.</p>
+                    <p class="text-xs opacity-50 pt-4 border-t dark:border-zinc-700">Switch between Chat and FAQ modes using the mode toggle button for different types of assistance.</p>
                 </div>
             `;
         }
@@ -535,18 +801,20 @@ Always respond quickly with practical solutions.`
 
             // User UI
             const uMsg = document.createElement('div');
-            uMsg.className = "flex justify-end quick-response";
+            uMsg.className = "flex justify-end message-anim";
             uMsg.innerHTML = `<div class="bg-black dark:bg-[#C84C2C] text-white p-5 px-8 rounded-3xl rounded-tr-none text-sm md:text-base font-medium shadow-xl max-w-[85%]">${message}</div>`;
             thread.appendChild(uMsg);
             input.value = '';
             scrollToBottom();
 
-            // Add to conversation history
-            conversationHistory.push({ role: 'user', content: message });
+            // Add to conversation history (for chat mode only)
+            if (chatMode === "chat") {
+                conversationHistory.push({ role: 'user', content: message });
+            }
 
-            // Show loading indicator
+            // Show enhanced loading indicator with dots
             const loadingMsg = document.createElement('div');
-            loadingMsg.className = "flex gap-4 quick-response";
+            loadingMsg.className = "flex gap-4 message-anim";
             loadingMsg.innerHTML = `
                 <div class="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center shrink-0 shadow-lg border border-black/5">
                     <div class="loading-wave">
@@ -558,7 +826,12 @@ Always respond quickly with practical solutions.`
                 </div>
                 <div class="glass-card glass-blur p-6 rounded-3xl rounded-tl-none flex-1 max-w-xl">
                     <div class="flex items-center">
-                        <p class="text-sm md:text-base font-medium opacity-80">${chatMode === "faq" ? "Searching FAQ database" : "Processing with AI"}<span class="loading-dots"></span></p>
+                        <p class="text-sm md:text-base font-medium opacity-80">${chatMode === 'faq' ? 'Searching FAQ database...' : 'Processing with AI...'}</p>
+                        <div class="thinking-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -570,27 +843,56 @@ Always respond quickly with practical solutions.`
                 
                 if (chatMode === "faq") {
                     // FAQ mode - search local database
-                    responseText = getFAQResponse(message);
-                    // Remove loading message immediately for instant feel
-                    setTimeout(() => {
-                        loadingMsg.remove();
-                        showResponse(responseText);
-                    }, 300); // Small delay to show loading state
-                    return; // Exit early for FAQ mode
+                    responseText = await getFAQResponse(message);
                 } else {
-                    // Chat mode - use OpenRouter API
+                    // Chat mode - use the OpenRouter AI API
                     responseText = await callOpenRouterAPI(message);
-                    loadingMsg.remove();
-                    showResponse(responseText);
                 }
+
+                // Remove loading message
+                loadingMsg.remove();
+                
+                // Add bot response to conversation history (for chat mode only)
+                if (chatMode === "chat") {
+                    conversationHistory.push({ role: 'assistant', content: responseText });
+                }
+
+                // Display bot response with improved formatting
+                const aMsg = document.createElement('div');
+                aMsg.className = "flex gap-4 message-anim";
+                const icon = chatMode === 'faq' ? 'fa-question-circle' : 'fa-robot';
+                aMsg.innerHTML = `
+                    <div class="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center shrink-0 shadow-lg border border-black/5">
+                        <i class="fas ${icon} text-[#C84C2C]"></i>
+                    </div>
+                    <div class="glass-card glass-blur p-6 rounded-3xl rounded-tl-none flex-1 max-w-xl ai-response">
+                        <div class="typing-cursor-container"></div>
+                    </div>
+                `;
+                thread.appendChild(aMsg);
+                const textContainer = aMsg.querySelector('.typing-cursor-container');
+                typeWriter(textContainer, responseText);
                 
             } catch (error) {
                 console.error('Error:', error);
                 loadingMsg.remove();
                 
-                // Fallback response
-                const fallbackResponse = getFallbackResponse(message);
-                showResponse(fallbackResponse);
+                // Enhanced fallback response
+                const fallbackResponse = getEnhancedFallbackResponse(message);
+                
+                const aMsg = document.createElement('div');
+                aMsg.className = "flex gap-4 message-anim";
+                aMsg.innerHTML = `
+                    <div class="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center shrink-0 shadow-lg border border-black/5">
+                        <i class="fas fa-robot text-[#C84C2C]"></i>
+                    </div>
+                    <div class="glass-card glass-blur p-6 rounded-3xl rounded-tl-none flex-1 max-w-xl ai-response">
+                        <div class="typing-cursor-container"></div>
+                    </div>
+                `;
+                thread.appendChild(aMsg);
+                const textContainer = aMsg.querySelector('.typing-cursor-container');
+                typeWriter(textContainer, fallbackResponse);
             } finally {
                 isProcessing = false;
                 sendBtn.disabled = false;
@@ -599,73 +901,13 @@ Always respond quickly with practical solutions.`
             }
         }
 
-        function showResponse(responseText) {
-            // Clean markdown from response
-            responseText = cleanMarkdown(responseText);
-            
-            // Add bot response to conversation history
-            conversationHistory.push({ role: 'assistant', content: responseText });
-            
-            // Display bot response instantly
-            const aMsg = document.createElement('div');
-            aMsg.className = "flex gap-4 quick-response";
-            aMsg.innerHTML = `
-                <div class="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center shrink-0 shadow-lg border border-black/5">
-                    <i class="fas fa-robot text-[#C84C2C]"></i>
-                </div>
-                <div class="glass-card glass-blur p-6 rounded-3xl rounded-tl-none flex-1 max-w-xl ai-response">
-                    <p class="text-sm md:text-base font-medium opacity-80 whitespace-pre-line">${responseText}</p>
-                </div>
-            `;
-            thread.appendChild(aMsg);
-            scrollToBottom();
-        }
-
-        function cleanMarkdown(text) {
-            // Remove all markdown formatting
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '$1') // Remove **bold**
-                .replace(/\*(.*?)\*/g, '$1') // Remove *italic*
-                .replace(/###\s*(.*)/g, '$1') // Remove ### headers
-                .replace(/##\s*(.*)/g, '$1') // Remove ## headers
-                .replace(/#\s*(.*)/g, '$1') // Remove # headers
-                .replace(/→/g, '→') // Keep arrow but remove if you want: .replace(/→/g, '')
-                .replace(/`(.*?)`/g, '$1') // Remove `code`
-                .replace(/~~(.*?)~~/g, '$1') // Remove ~~strikethrough~~
-                .replace(/\[(.*?)\]\((.*?)\)/g, '$1') // Remove [link](url)
-                .replace(/\n{3,}/g, '\n\n') // Limit consecutive newlines
-                .trim();
-        }
-
-        function getFAQResponse(message) {
-            const lowerMsg = message.toLowerCase();
-            
-            // Search for matching FAQ
-            for (const faq of faqDatabase) {
-                for (const keyword of faq.keywords) {
-                    if (lowerMsg.includes(keyword)) {
-                        return faq.answer;
-                    }
-                }
-            }
-            
-            // Default FAQ response if no match found
-            return `I can help with common campus questions at ASTU. Here are topics I can assist with:\n\n• Dormitory and housing issues\n• Maintenance and repair requests\n• Library and study facilities\n• Campus network and WiFi\n• Security and emergencies\n• Academic registration\n• Fee payments\n• Transportation\n• Cafeteria services\n• Health services\n• Sports facilities\n• Internship and career services\n• Graduation procedures\n• Contact information\n\nPlease ask about one of these topics for a specific answer, or switch to Chat Mode for more detailed AI assistance.`;
-        }
-
         async function callOpenRouterAPI(userMessage) {
             try {
-                // Prepare messages for API with instruction to avoid markdown
+                // Prepare messages for API
                 const messages = [
-                    ...conversationHistory.slice(-6), // Reduced context for faster response
-                    { 
-                        role: 'user', 
-                        content: userMessage + "\n\nPlease respond without any markdown formatting (no **, ###, → symbols). Use plain text with clear paragraphs and bullet points using • symbol." 
-                    }
+                    ...conversationHistory.slice(-10), // Last 10 messages for context
+                    { role: 'user', content: userMessage }
                 ];
-
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
                 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                     method: 'POST',
@@ -679,44 +921,205 @@ Always respond quickly with practical solutions.`
                         model: MODEL,
                         messages: messages,
                         stream: false,
-                        max_tokens: 800,
+                        max_tokens: 1500,
                         temperature: 0.7
-                    }),
-                    signal: controller.signal
+                    })
                 });
-
-                clearTimeout(timeoutId);
 
                 if (!response.ok) {
                     throw new Error(`API error: ${response.status}`);
                 }
 
                 const data = await response.json();
-                const rawResponse = data.choices[0]?.message?.content || 'I apologize, but I could not generate a response. Please try again or switch to FAQ mode for instant answers.';
+                const rawResponse = data.choices[0]?.message?.content || 'No response received from the AI model.';
                 
-                return rawResponse;
+                // Format the response for better readability
+                return formatAIResponse(rawResponse);
                 
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    return "I'm experiencing some delays. For immediate assistance, please:\n\n1. Switch to FAQ mode for instant answers to common questions\n2. Contact the relevant department directly\n3. Try again in a few moments\n\nFor urgent dormitory issues, contact Housing Office: +251 22 111 0000 ext. 221";
-                }
                 console.error('OpenRouter API error:', error);
                 throw error;
             }
         }
 
-        function getFallbackResponse(message) {
+        function formatAIResponse(text) {
+            // Basic formatting
+            let formatted = text;
+            
+            // Replace markdown-style bullet points with HTML spans
+            formatted = formatted.replace(/\n\s*[-•*]\s+/g, '\n• ');
+            
+            // Add spacing between paragraphs
+            formatted = formatted.replace(/\n\n/g, '</p><p>');
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            // Wrap in paragraph tags if needed
+            if (!formatted.startsWith('<p>')) {
+                formatted = '<p>' + formatted + '</p>';
+            }
+            
+            return formatted;
+        }
+
+        async function getFAQResponse(message) {
+            // Convert message to lowercase for matching
             const lowerMsg = message.toLowerCase();
             
-            if (lowerMsg.includes('hi') || lowerMsg.includes('hello') || lowerMsg.includes('hey')) {
-                return "Hello! I'm CampusFix AI Assistant. How can I help you with campus-related issues today? You can ask about dormitory problems, maintenance requests, or any campus concerns.";
+            // Find the best matching FAQ based on keywords
+            let bestMatch = null;
+            let highestScore = 0;
+            
+            for (const faq of faqDatabase) {
+                let score = 0;
+                
+                // Check each keyword
+                for (const keyword of faq.keywords) {
+                    if (lowerMsg.includes(keyword.toLowerCase())) {
+                        score += 1;
+                    }
+                }
+                
+                // Check if the question is similar
+                if (lowerMsg.includes(faq.question.toLowerCase().substring(0, 20))) {
+                    score += 3; // Higher weight for direct question match
+                }
+                
+                if (score > highestScore) {
+                    highestScore = score;
+                    bestMatch = faq;
+                }
             }
             
-            if (lowerMsg.includes('what is campusfix') || lowerMsg.includes('who are you')) {
-                return "CampusFix is an AI-powered assistant for Adama Science and Technology University. I help students with campus issues, maintenance requests, dormitory problems, and general campus information. Use FAQ mode for instant answers or Chat mode for detailed AI assistance.";
+            // Return the best match or a default response
+            if (bestMatch && highestScore >= 1) {
+                return bestMatch.answer + `<p class="text-xs opacity-50 mt-4"><i>FAQ Mode: This answer is from our curated campus knowledge base.</i></p>`;
+            } else {
+                // No good match found, show related FAQs
+                let relatedFAQs = '';
+                const shuffledFAQs = [...faqDatabase].sort(() => 0.5 - Math.random()).slice(0, 5);
+                
+                shuffledFAQs.forEach(faq => {
+                    relatedFAQs += `<div onclick="setInputFromFAQ('${faq.question.replace(/'/g, "\\'")}')" 
+                                   class="faq-suggestion p-3 bg-gray-50 dark:bg-zinc-800 rounded-xl text-xs cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700 transition my-2">
+                                   <div class="flex items-center gap-2">
+                                       <i class="fas fa-lightbulb text-[#C84C2C] text-xs"></i>
+                                       <span>${faq.question}</span>
+                                   </div>
+                               </div>`;
+                });
+                
+                return `<p><strong>FAQ Search Results</strong></p>
+<p>I couldn't find an exact match for your question in our FAQ database. Here are some related questions you might find helpful:</p>
+${relatedFAQs}
+<p class="mt-4">Or try switching to <strong>Chat Mode</strong> for AI-generated responses to any campus-related questions.</p>`;
+            }
+        }
+
+        function getEnhancedFallbackResponse(message) {
+            const lowerMsg = message.toLowerCase();
+            
+            if (lowerMsg.includes('hi') || lowerMsg.includes('hello') || lowerMsg.includes('hey') || lowerMsg.includes('greetings')) {
+                return `<p><strong>Welcome to CampusFix AI Assistant!</strong></p>
+<p>Hello! I'm your dedicated campus assistant for Adama Science and Technology University. I'm here to help you with:</p>
+<ul>
+<li>Campus issue reporting and tracking</li>
+<li>Dormitory and housing concerns</li>
+<li>Facility maintenance requests</li>
+<li>Campus service information</li>
+<li>Emergency guidance</li>
+</ul>
+<p>How can I assist you with campus-related matters today?</p>`;
             }
             
-            return "I'm here to help with campus-related issues at ASTU. You can ask about dormitories, maintenance, facilities, or general campus information. For faster responses to common questions, try FAQ mode. What would you like to know?";
+            if (lowerMsg.includes('what is campusfix') || lowerMsg.includes('who are you') || lowerMsg.includes('what do you do')) {
+                return `<p><strong>About CampusFix AI Assistant</strong></p>
+<p>CampusFix is an AI-powered support system designed specifically for Adama Science and Technology University (ASTU). My primary functions include:</p>
+
+<div class="info-block">
+<strong>Core Capabilities:</strong><br>
+• Campus issue documentation and reporting<br>
+• Maintenance request guidance<br>
+• Campus service information provision<br>
+• Emergency protocol guidance<br>
+• Policy and regulation clarification
+</div>
+
+<p>I'm powered by DeepSeek's advanced AI technology and trained specifically on ASTU campus procedures and protocols.</p>`;
+            }
+            
+            if (lowerMsg.includes('problem') || lowerMsg.includes('issue') || lowerMsg.includes('broken') || lowerMsg.includes('complaint')) {
+                return `<p><strong>Campus Issue Reporting Guidance</strong></p>
+<p>To effectively report a campus issue, please provide the following details:</p>
+
+<ol>
+<li><strong>Location:</strong> Building name, floor, and room number</li>
+<li><strong>Issue Description:</strong> What exactly is the problem?</li>
+<li><strong>Urgency Level:</strong> Is this a safety hazard or urgent matter?</li>
+<li><strong>Time:</strong> When did you notice the issue?</li>
+<li><strong>Contact:</strong> How can we reach you for updates?</li>
+</ol>
+
+<p>Once you provide these details, I'll guide you through the appropriate reporting channel and provide expected resolution timelines.</p>`;
+            }
+            
+            return `<p><strong>How I Can Help You</strong></p>
+<p>I'm designed to assist with a wide range of campus-related matters at ASTU. Here are some examples of what I can help with:</p>
+
+<ul>
+<li><strong>Facility Issues:</strong> Report problems with classrooms, labs, or common areas</li>
+<li><strong>Housing Concerns:</strong> Address dormitory maintenance or policy questions</li>
+<li><strong>Service Information:</strong> Provide details about campus services and resources</li>
+<li><strong>Procedure Guidance:</strong> Explain campus protocols and reporting processes</li>
+<li><strong>Emergency Response:</strong> Guide you through appropriate emergency procedures</li>
+</ul>
+
+<p>Please describe your specific situation or question, and I'll provide tailored, actionable assistance.</p>`;
+        }
+
+        function typeWriter(element, text) {
+            let i = 0;
+            let htmlBuffer = '';
+            let tagMode = false;
+            let tagBuffer = '';
+            
+            function type() {
+                if (i < text.length) {
+                    const char = text.charAt(i);
+                    
+                    if (char === '<') {
+                        tagMode = true;
+                        tagBuffer = char;
+                        i++;
+                        return type();
+                    } else if (char === '>' && tagMode) {
+                        tagMode = false;
+                        tagBuffer += char;
+                        htmlBuffer += tagBuffer;
+                        element.innerHTML = htmlBuffer + '<span class="typing-cursor"></span>';
+                        i++;
+                        setTimeout(type, 10);
+                        return;
+                    }
+                    
+                    if (tagMode) {
+                        tagBuffer += char;
+                        i++;
+                        setTimeout(type, 10);
+                    } else {
+                        htmlBuffer += char;
+                        element.innerHTML = htmlBuffer + '<span class="typing-cursor"></span>';
+                        i++;
+                        scrollToBottom();
+                        setTimeout(type, 10);
+                    }
+                } else {
+                    element.innerHTML = htmlBuffer;
+                    // Remove cursor when done
+                    const cursors = document.querySelectorAll('.typing-cursor');
+                    cursors.forEach(cursor => cursor.style.display = 'none');
+                }
+            }
+            type();
         }
 
         function updateHistoryUI() {
@@ -746,7 +1149,7 @@ Always respond quickly with practical solutions.`
                     conversationHistory = parsed.conversation || [
                         {
                             role: "system",
-                            content: `You are CampusFix AI, an assistant for Adama Science and Technology University (ASTU) students. Respond with clean, professional language without markdown formatting (no **, ###, →, or other markdown symbols). Write in a friendly, helpful tone with clear structure.`
+                            content: `You are CampusFix AI, an intelligent assistant for Adama Science and Technology University (ASTU) students and staff.`
                         }
                     ];
                     updateHistoryUI();
@@ -759,27 +1162,27 @@ Always respond quickly with practical solutions.`
         function saveChatHistory() {
             localStorage.setItem('campusfix_chat_history', JSON.stringify({
                 history: chatHistory,
-                conversation: conversationHistory.slice(-15)
+                conversation: conversationHistory.slice(-20)
             }));
         }
 
         function newIncident() {
             thread.innerHTML = `
-                <div class="flex gap-4 quick-response">
+                <div class="flex gap-4 message-anim">
                     <div class="w-10 h-10 rounded-xl bg-[#C84C2C] text-white flex items-center justify-center shrink-0 shadow-lg">
                         <i class="fas fa-robot text-sm"></i>
                     </div>
                     <div class="glass-card glass-blur p-6 rounded-3xl rounded-tl-none flex-1 ai-response">
                         <h2 class="text-xl font-bold mb-2">New Chat Session Started</h2>
-                        <p class="text-sm opacity-70 mb-3">I'm ready to assist you with any campus-related issues or questions. Use FAQ mode for instant answers to common questions, or Chat mode for detailed AI-powered assistance.</p>
-                        <p class="text-xs opacity-50 mt-2">Current Mode: ${chatMode.toUpperCase()} | Switch using MODE button</p>
+                        <p class="text-sm opacity-70 mb-3">I'm ready to assist you with any campus-related issues or questions. Whether you need to report a maintenance problem, get information about campus services, or seek guidance on university procedures, I'm here to help.</p>
+                        <p class="text-xs opacity-50 mt-2">AI Assistant | Active Session | Mode: ${chatMode.toUpperCase()}</p>
                     </div>
                 </div>
             `;
             conversationHistory = [
                 {
                     role: "system",
-                    content: `You are CampusFix AI, an assistant for Adama Science and Technology University (ASTU) students. Respond with clean, professional language without markdown formatting (no **, ###, →, or other markdown symbols). Write in a friendly, helpful tone with clear structure.`
+                    content: `You are CampusFix AI, an intelligent assistant for Adama Science and Technology University (ASTU) students and staff.`
                 }
             ];
             saveChatHistory();

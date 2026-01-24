@@ -473,7 +473,30 @@ app.post('/submitIssue', upload.single('photo'), (req, res) => {
 
 
 
+app.post("/api/ai-support", async (req, res) => {
+  try {
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: process.env.model,
+        messages: [
+          { role: "user", content: req.body.message }
+        ]
+      },
+      {
+        headers: {
+          "Authorization": Bearer ${process.env.openRouterApiKey},
+          "Content-Type": "application/json"
+        }
+      }
+    );
 
+    res.json({ reply: response.data.choices[0].message.content });
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+    res.status(500).json({ error: "AI service error" });
+  }
+});
 
 
 
