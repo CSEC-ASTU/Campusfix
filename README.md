@@ -1,6 +1,6 @@
 # 🛠️ Campus Fix
 
-**Bridging the gap between students and campus maintenance through real-time, intelligent reporting.**
+**Bridging the gap between students and campus dormitory maintenance through real-time, intelligent reporting.**
 
 ---
 
